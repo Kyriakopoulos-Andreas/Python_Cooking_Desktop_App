@@ -3,12 +3,21 @@ from Menu import Menu
 
 
 
-class INTRO(customtkinter.CTk):
+class Intro(customtkinter.CTk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.search = customtkinter.StringVar()
         self.title("Let's Cook")
-        self.geometry(f"{1400}x{800}")
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+
+        # Set window size
+        self.overrideredirect(False)  # to allow for the window decorations
+        width = int(self.winfo_screenwidth() * 1.039)
+        height = int(self.winfo_screenheight() * 0.941)
+        x = int(self.winfo_screenwidth() / 2 - width / 2 + 25)
+        y = int(self.winfo_screenheight() / 2 - height / 2 - 40)
+        self.geometry("{0}x{1}+{2}+{3}".format(width, height, x, y))
+        self.resizable(True, True)
         self.iconbitmap(r"C:\Users\Admin\Desktop\logo\image.ico")
         self.image = Image.open(r"C:\Users\Admin\Desktop\logo\cook.jpg")
         self.photoImage = ImageTk.PhotoImage(self.image)
@@ -27,11 +36,11 @@ class INTRO(customtkinter.CTk):
         self.photo = customtkinter.CTkImage(self.img)
 
         # Entry Button
-        self.exit_button = customtkinter.CTkButton(self, text="Let's Cook", width=200, height=40, image=self.photo,
-                                                   corner_radius=2, text_color='Black', fg_color="#A4A4A4",
-                                                   font=('Arial', 20),
-                                                   command=self.show_second_window)
-        self.exit_button.grid(row=1, column=1, padx=0, pady=0)
+        self.LetS_Cook_Button = customtkinter.CTkButton(self, text="Let's Cook", width=200, height=40, image=self.photo,
+                                                        corner_radius=2, text_color='Black', fg_color="#A4A4A4",
+                                                        font=('Arial', 20),
+                                                        command=self.show_second_window)
+        self.LetS_Cook_Button.grid(row=1, column=1, padx=0, pady=0)
 
         # Periodically resize the image to reduce lag and flashing
         self._resize_image()
@@ -59,5 +68,5 @@ class INTRO(customtkinter.CTk):
 
     def show_second_window(self):
         self.destroy()
-        menu = Menu()
-        menu.mainloop()
+        self.menu = Menu()
+        self.menu.mainloop()
