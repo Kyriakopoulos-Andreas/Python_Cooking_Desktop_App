@@ -1,14 +1,17 @@
 from imports import *
-from registrationDef import RegistrationDef
+from Registration import RegistrationDef
+from Word_cuisine import Word_cuisine
+from Recipe_search import Recipe_search
+
 
 
 class Menu(customtkinter.CTk):
     def __init__(self):
         super().__init__()
 
-
-
-
+        self.recipe_search_window = None
+        self._resize_image_callback = None
+        self.information_window = None
         self.textboxes = None
         self.slider_count = None
         self.slider_button = None
@@ -47,7 +50,7 @@ class Menu(customtkinter.CTk):
         self.photoLabel.place(relx=0, rely=0, relwidth=1, relheight=1)
 
         # Schedule the first image resize
-        self._resize_image_id = self.after(400, self._resize_image)
+
 
         # Grid Layout
         self.grid_columnconfigure(1, weight=1)
@@ -64,17 +67,19 @@ class Menu(customtkinter.CTk):
         self.logo_label.grid(row=0, column=0, padx=20, pady=(20, 10))
 
         # Buttons
-        self.button1 = customtkinter.CTkButton(self.left_frame, text="Registration Recipe", command=self.button_click,
+        self.button1 = customtkinter.CTkButton(self.left_frame, text="Registration Recipe",
+                                               command=self.registration_window,
                                                width=120, height=40)
-        self.button1.grid(row=1, column=0, padx=20, pady=20, )
+        self.button1.grid(row=1, column=0, padx=20, pady=(80, 20), )
         self.button2 = customtkinter.CTkButton(self.left_frame, text="Editing", width=130, height=40)
-        self.button2.grid(row=2, column=0, padx=20, pady=10, )
+        self.button2.grid(row=2, column=0, padx=20, pady=10 )
         # Search window button
         self.search_button = customtkinter.CTkButton(self.left_frame, text="Recipe Search", width=130, height=40,
                                                      command=self.search_button_click)
         self.search_button.grid(row=3, column=0, padx=0, pady=20, )
         # Delete Button
-        self.button3 = customtkinter.CTkButton(self.left_frame, text="Delete", width=130, height=40)
+        self.button3 = customtkinter.CTkButton(self.left_frame, text="Word's Cuisines",
+                                               width=130, height=40, command=self.word_cuisine)
         self.button3.grid(row=4, column=0, padx=0, pady=10, )
 
         # exit button
@@ -92,35 +97,13 @@ class Menu(customtkinter.CTk):
         self.option_button.grid(row=7, column=0, padx=5, pady=20, sticky="s")
 
     def search_button_click(self):
-        search_text = self.search.get()
-        self.dialog = customtkinter.CTkInputDialog(text="Search for something delicious", title="Recipe Search")
-        print(f"Searching for '{search_text}'...")
-        dialog_width = 400
-        dialog_height = 200
-        screen_width = self.winfo_screenwidth()
-        screen_height = self.winfo_screenheight()
-        x = (screen_width - dialog_width) // 2
-        y = (screen_height - dialog_height) // 2
-        self.dialog.geometry(f"{dialog_width}x{dialog_height}+{x}+{y}")
+        self.destroy()
+        self.recipe_search_window = Recipe_search()
+        
+        self.recipe_search_window.mainloop()
+        
 
-    def _resize_image(self):
-        # Cancel any previous after task
-        if self._resize_image_id is not None:
-            self.after_cancel(self._resize_image_id)
-            self._resize_image_id = None
 
-        # Resize the image to fit the window size
-        width = self.winfo_width()
-        height = self.winfo_height()
-        image = self.image.resize((width, height), Image.LANCZOS)
-        photo_image = ImageTk.PhotoImage(image)
-
-        # Update the label with the new image
-        self.photoLabel.configure(image=photo_image)
-        self.photoLabel.image = photo_image
-
-        # Schedule the next image resize
-        self._resize_image_id = self.after(16, self._resize_image)
 
     def exit_app(self):
         user_input = messagebox.askyesno("Exit", "Are you sure you want to exit?")
@@ -130,9 +113,18 @@ class Menu(customtkinter.CTk):
     def change_skin(self, new_appearance_mode: str):
         customtkinter.set_appearance_mode(new_appearance_mode)
 
-    def button_click(self):
+    def registration_window(self):
         self.destroy()
         self.pop_up = RegistrationDef()
 
         self.pop_up.mainloop()
 
+    def word_cuisine(self):
+        self.information_window = Word_cuisine()
+        self.information_window.mainloop()
+
+
+
+if __name__ == "__main__":
+    app = Menu()
+    app.mainloop()

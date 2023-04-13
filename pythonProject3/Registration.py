@@ -1,10 +1,11 @@
 from imports import *
-from datetime import timedelta
 
 
 class RegistrationDef(customtkinter.CTk):
-    def __init__(self, step_size=3, _command=None, *args, **kwargs, ):
+    def __init__(self, step_size=3, _command=None, *args, **kwargs ):
         super().__init__(*args, **kwargs)
+        self.format_categoriess = None
+        self.extra_title2 = None
         self.entry_third_step = None
         self.extra_title = None
         self.tab3_text_boxes = []
@@ -16,7 +17,7 @@ class RegistrationDef(customtkinter.CTk):
         self.main_frame = None
         self.recipe_tittle = None
         self.current_timer_index = 0
-        self._command = _command
+
 
         self.step_size = step_size
         # Set window size to full screen
@@ -54,7 +55,7 @@ class RegistrationDef(customtkinter.CTk):
         self.main_frame.grid_columnconfigure((0, 1, 2, 4, 5), weight=1)
 
         self.tabview = customtkinter.CTkTabview(self.main_frame, border_width=5, corner_radius=30)
-        self.tabview.grid(row=0, column=1, rowspan=3, columnspan=4, padx=(100, 1), pady=(20, 0), sticky="nsew")
+        self.tabview.grid(row=0, column=1, rowspan=3, columnspan=4, padx=(1, 1), pady=(20, 0), sticky="nsew")
         self.tabview.add("step 1")
         self.tabview.add("step 2")
         self.tabview.add("step 3")
@@ -68,40 +69,77 @@ class RegistrationDef(customtkinter.CTk):
         # Buttons
 
         self.Save_Button = customtkinter.CTkButton(self.main_frame, text="Save Recipe", font=('Arial', 13, 'bold'),
-                                                   command=self.return_to_menu)
-        self.Save_Button.grid(row=3, column=6, pady=5, sticky="nsew")
+                                                   command=self.save_registration)
+        self.Save_Button.grid(row=3, column=6, sticky="nsew")
+
+        self.Back_Button = customtkinter.CTkButton(self.main_frame, text="   ←  back     ", font=('Arial', 13, 'bold'),
+                                                   height=27, width=150, corner_radius=7, command=self.return_to_menu)
+        self.Back_Button.grid(row=0, column=0, sticky="nw")
 
         self.combobox = customtkinter.CTkOptionMenu(self.tabview.tab("step 1"), width=400, height=25, corner_radius=10,
                                                     dropdown_hover_color="#A4A4A4", dynamic_resizing=False,
-                                                    dropdown_font=('Arial', 15), font=('Arial', 18, 'bold'),
+                                                    dropdown_font=('bold', 18), font=('Arial', 18, 'bold'),
+                                                    command=self.display_categories,
                                                     values=[
-                                                        "                         Mediterranean                    ",
-                                                        "                             Chinese                      ",
-                                                        "                             Mexican                      ",
-                                                        "                             Arabic                       ",
-                                                        "                             Thai"], )
+                                                        f"{'Mediterranean':^65}",
+                                                        f"{'Chinese':^70}",
+                                                        f"{'Mexican':^70}",
+                                                        f"{'Arabic':^70}",
+                                                        f"{'Thai':^70}"])
+
         self.combobox.grid(row=1, column=0, padx=(380, 90), pady=(20, 60), sticky="s")
+
+        self.chinese_categories = ["BaoBan", "Noodles", "Sushi", "Ramen", "Soups", "Rice Dish", "Bowl",
+                                   "Street Food"]
+        self.mexican_categories = ["Tacos", "Burritos", "Enchiladas", "Fajitas", "Quesadilla", "Nachos"]
+        self.italian_categories = ["Pizza", "Pasta", "Lasagna", "Risotto", "Dessert"]
+        self.mediterranean_categories = ["Sea Food", "Meet", "Salad", "Vegetable", "Legumes", "Pie", "Pasta's",
+                                         "Dessert"]
+        self.thai_categories = ["Sea Food", "Soups", "Curries", "Pounded", "Noodles", "Rice Dish", "Salads"]
+        self.arabic_categories = ["Shakshuka", "Lahmacun", "Falafel", "Hummus", "Kebab", "Salad", "Dessert"
+                                  ]
+
+        self.format_categories = [
+            self.chinese_categories,
+            self.mexican_categories,
+            self.italian_categories,
+            self.mediterranean_categories,
+            self.thai_categories,
+            self.arabic_categories
+        ]
+
+        # Loop through each category list
+        for category in self.format_categories:
+            for i in range(len(category)):
+                # Apply the formatting to each element in the category list
+                category[i] = f"{category[i]:^82}"
 
         self.category_box = customtkinter.CTkOptionMenu(self.tabview.tab("step 1"),
                                                         width=500, height=25, corner_radius=10,
                                                         dropdown_hover_color="#A4A4A4", dynamic_resizing=False,
-                                                        dropdown_font=('Arial', 15), font=('Arial', 18, 'bold'),
+                                                        dropdown_font=('bold', 18), font=('Arial', 18, 'bold'),
                                                         values=[
-                                                            "                                      Pasta's                                ",
-                                                            "                                      Seafood                                ",
-                                                            "                                     Vagetables                              ",
-                                                            "                                     Breakfast                               ",
-                                                            "                                      Meet"], )
+                                                            f"{'Sea Food':^82}",
+                                                            f"{'Meet':^82}",
+                                                            f"{'Salad':^82}",
+                                                            f"{'Vegetable':^82}",
+                                                            f"{'Legumes':^82}",
+                                                            f"{'Pie':^82}",
+                                                            f"{'Pasta':^82}",
+                                                            f"{'Dessert':^82}"])
+        self.category_box.set(f"{'Choose Category':>48}")
         self.category_box.grid(row=3, column=0, padx=(315, 1), pady=(10, 1), sticky="s")
+
+        # Bind the <<ComboboxSelected>> event to the display_categories method
 
         self.difficulty_box = customtkinter.CTkOptionMenu(self.tabview.tab("step 1"),
                                                           width=500, height=25, corner_radius=10,
                                                           dropdown_hover_color="#A4A4A4", dynamic_resizing=False,
-                                                          dropdown_font=('Arial', 15), font=('Arial', 18, 'bold'),
+                                                          dropdown_font=('bold', 18), font=('Arial', 18, 'bold'),
                                                           values=[
-                                                              "                                      Easy                                ",
-                                                              "                                     Medium                               ",
-                                                              "                                     Difficult                            ",
+                                                              f"{'Easy':^83}",
+                                                              f"{'Medium':^85}",
+                                                              f"{'Difficult':^88}",
                                                           ], )
         self.difficulty_box.grid(row=4, column=0, padx=(315, 1), pady=(10, 1), sticky="s")
 
@@ -131,7 +169,7 @@ class RegistrationDef(customtkinter.CTk):
 
         # Titles
         self.tittle = customtkinter.CTkLabel(self.main_frame, text="Registration Recipe", font=('Century Gothic', 20))
-        self.tittle.grid(row=0, column=1, columnspan=4, padx=(100, 1), pady=1, sticky="n")
+        self.tittle.grid(row=0, column=1, columnspan=4, padx=(1, 1), pady=1, sticky="n")
         self.combobox_tittle = customtkinter.CTkLabel(self.tabview.tab("step 1"), text="Choose Cuisine:",
                                                       font=('Century Gothic', 24))
         self.combobox_tittle.grid(row=0, column=0, padx=(590, 290), pady=0, sticky="nsew")
@@ -185,7 +223,6 @@ class RegistrationDef(customtkinter.CTk):
                                                           scrollbar_button_hover_color="#3786D9",
                                                           width=670, corner_radius=12, border_width=5,
                                                           border_color=("#3673F8", "orange",)
-
                                                           )
         self.tab_frame.grid(row=1, column=1, padx=(370, 1), pady=(60, 1), sticky="nsew")
         self.tab_frame.grid_columnconfigure(0, weight=1)
@@ -209,7 +246,7 @@ class RegistrationDef(customtkinter.CTk):
 
         self.slider_count = customtkinter.CTkLabel(self.tab_frame, text="0",
                                                    font=('Arial', 18,))  # create the label to display the count
-        self.slider_count.grid(row=2, column=1,  pady=(1, 50))
+        self.slider_count.grid(row=2, column=1, pady=(1, 50))
         self.slider.bind("<B1-Motion>", self.update_count)
 
         # Apply Steps Button
@@ -219,6 +256,7 @@ class RegistrationDef(customtkinter.CTk):
         self.slider_button.grid(row=5, column=0, padx=(260, 1), pady=(1, 50), sticky="w")
 
     def create_textboxes(self):
+
         # We use the value of slider
 
         # Extra Title Enter Steps
@@ -226,6 +264,10 @@ class RegistrationDef(customtkinter.CTk):
                                                   text="Enter the steps below:",
                                                   font=('Century Gothic', 24))
         self.extra_title.grid(row=6, column=0, columnspan=4, padx=(1, 1), pady=(1, 1), sticky="nsew")
+        self.extra_title2 = customtkinter.CTkLabel(self.tab_frame,
+                                                   text="Use timers for the duration of each step:",
+                                                   font=('Century Gothic', 12))
+        self.extra_title2.grid(row=7, column=0, columnspan=4, padx=(1, 1), pady=(1, 1), sticky="nsew")
 
         widgets_to_remove = self.tab3_text_boxes + self.subtract_button_timers + self.timers + self.add_button_timers + self.step_message_array
 
@@ -242,7 +284,6 @@ class RegistrationDef(customtkinter.CTk):
                 self.add_button_timers.remove(widget)
             if widget in self.step_message_array:
                 self.step_message_array.remove(widget)
-
 
         number_of_rec = int(self.slider.get())
 
@@ -302,7 +343,6 @@ class RegistrationDef(customtkinter.CTk):
                 hours, minutes = divmod(new_time.seconds // 60, 60)
                 formatted_time = f"{hours:11}:{minutes:02}"
 
-
                 entry_third_step.delete(0, "end")
                 entry_third_step.insert(0, formatted_time)
             except ValueError:
@@ -321,8 +361,6 @@ class RegistrationDef(customtkinter.CTk):
 
             hours, minutes = divmod(new_time.seconds // 60, 60)
             formatted_time = f"{hours:30}:{minutes:02}"
-
-
 
             self.entry.delete(0, "end")
             self.entry.insert(0, formatted_time)
@@ -349,13 +387,51 @@ class RegistrationDef(customtkinter.CTk):
                             "end-1c") == "A recipe has no soul.\nYou, as the cook, must bring soul to the recipe!":
             self.second_step.place_forget()
             self.textbox.delete("1.0", "end")
-            self.textbox.unbind("<FocusIn>", self.clear_text)
+            self.textbox.unbind("<FocusIn>", None)
+
+    def display_categories(self, event):
+        selected_cuisine = self.combobox.get().strip()
+
+        categories = []
+
+        if selected_cuisine == "Chinese":
+            categories = self.chinese_categories
+        elif selected_cuisine == "Mexican":
+            categories = self.mexican_categories
+        elif selected_cuisine == "Mediterranean":
+            categories = self.mediterranean_categories
+        elif selected_cuisine == "Thai":
+            categories = self.thai_categories
+        elif selected_cuisine == "Arabic":
+            categories = self.arabic_categories
+
+        # Clear the old categories from category_box
+        self.category_box.set(f"{'Choose Category':>48}")
+        # Set the categories as the values of category_box combobox
+        self.category_box.configure(values=categories)
 
     def return_to_menu(self):
         self.destroy()
         from Menu import Menu
         self.back = Menu()
         self.back.mainloop()
+
+    def save_registration(self):
+        if self.Recipe_name.get() == "":
+            # Display message to user that recipe name is empty
+            messagebox.showerror("Error", "Recipe name cannot be empty.")
+        elif self.textbox.get('1.0', 'end-1c') == "" \
+                or self.textbox.get('1.0', 'end-1c') == "A recipe has no soul.\nYou," \
+                                                        " as the cook, must bring soul to the recipe!":
+            # Display message to user that textbox is empty
+            messagebox.showerror("Error", "Textbox cannot be empty.")
+            # Special string arguments used to represent the starting and ending positions of a text widget's content.
+        else:
+            # Save recipe and close window
+            self.destroy()
+            from Menu import Menu
+            self.back = Menu()
+            self.back.mainloop()
 
 
 if __name__ == "__main__":

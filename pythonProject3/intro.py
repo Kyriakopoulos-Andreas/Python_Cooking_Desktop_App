@@ -6,9 +6,9 @@ from Menu import Menu
 class Intro(customtkinter.CTk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.menu = None
         self.title("Let's Cook")
-        screen_width = self.winfo_screenwidth()
-        screen_height = self.winfo_screenheight()
+
 
         # Set window size
         self.overrideredirect(False)  # to allow for the window decorations
@@ -42,27 +42,7 @@ class Intro(customtkinter.CTk):
                                                         command=self.show_second_window)
         self.LetS_Cook_Button.grid(row=1, column=1, padx=0, pady=0)
 
-        # Periodically resize the image to reduce lag and flashing
-        self._resize_image()
 
-    def _resize_image(self):
-        # Clear any previous after task
-        if hasattr(self, '_resize_image_id'):
-            self.after_cancel(self._resize_image_id)
-
-        # Resize the image to fit the window size
-        width = self.winfo_width()
-        height = self.winfo_height()
-        image = self.image.resize((width, height), Image.LANCZOS)
-        photo_image = ImageTk.PhotoImage(image)
-
-        # Update the label with the new image
-        self.photoLabel.configure(image=photo_image)
-        self.photoLabel.image = photo_image
-
-        # Schedule the next image resize
-        self._resize_image_id = self.after(5, self._resize_image)
-        self.bind('<Destroy>', lambda event: self.after_cancel(self._resize_image_id))
 
 
 
