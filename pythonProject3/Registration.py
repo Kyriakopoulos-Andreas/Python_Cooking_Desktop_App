@@ -1,9 +1,10 @@
 from imports import *
 
 
-class RegistrationDef(customtkinter.CTk):
-    def __init__(self, step_size=3, _command=None, *args, **kwargs ):
-        super().__init__(*args, **kwargs)
+class Registration(customtkinter.CTk):
+    def __init__(self, prev_x, prev_y, intro_width, intro_height):
+        super().__init__()
+        self.counter_of_text_boxes = None
         self.format_categoriess = None
         self.extra_title2 = None
         self.entry_third_step = None
@@ -11,25 +12,19 @@ class RegistrationDef(customtkinter.CTk):
         self.tab3_text_boxes = []
         self.timers = []
         self.subtract_button_timers = []
+        self.title_textbox_array = []
         self.add_button_timers = []
         self.step_message_array = []
         self.back = None
         self.main_frame = None
         self.recipe_tittle = None
         self.current_timer_index = 0
+        self.text_boxes_counter = 0
+        self.geometry("{0}x{1}+{2}+{3}".format(intro_width, intro_height, prev_x, prev_y))
 
-
-        self.step_size = step_size
+        self.step_size = 3
         # Set window size to full screen
         self.title("Registration")
-
-        self.overrideredirect(False)  # to allow for the window decorations
-        width = int(self.winfo_screenwidth() * 1.039)
-        height = int(self.winfo_screenheight() * 0.941)
-        x = int(self.winfo_screenwidth() / 2 - width / 2 + 25)
-        y = int(self.winfo_screenheight() / 2 - height / 2 - 40)
-        self.geometry("{0}x{1}+{2}+{3}".format(width, height, x, y))
-        self.resizable(True, True)
 
         # Set window position and size
 
@@ -252,10 +247,10 @@ class RegistrationDef(customtkinter.CTk):
         # Apply Steps Button
         self.slider_button = customtkinter.CTkButton(self.tab_frame, text="Apply Steps",
                                                      width=150, border_width=0, corner_radius=8,
-                                                     font=('Arial', 13, 'bold'), command=self.create_textboxes)
+                                                     font=('Arial', 13, 'bold'), command=self.create_text_boxes)
         self.slider_button.grid(row=5, column=0, padx=(260, 1), pady=(1, 50), sticky="w")
 
-    def create_textboxes(self):
+    def create_text_boxes(self):
 
         # We use the value of slider
 
@@ -263,14 +258,14 @@ class RegistrationDef(customtkinter.CTk):
         self.extra_title = customtkinter.CTkLabel(self.tab_frame,
                                                   text="Enter the steps below:",
                                                   font=('Century Gothic', 24))
-        self.extra_title.grid(row=6, column=0, columnspan=4, padx=(1, 1), pady=(1, 1), sticky="nsew")
+        self.extra_title.grid(row=6, column=0, columnspan=4, padx=(17, 1), pady=(1, 1), sticky="nsew")
         self.extra_title2 = customtkinter.CTkLabel(self.tab_frame,
                                                    text="Use timers for the duration of each step:",
                                                    font=('Century Gothic', 12))
         self.extra_title2.grid(row=7, column=0, columnspan=4, padx=(1, 1), pady=(1, 1), sticky="nsew")
 
-        widgets_to_remove = self.tab3_text_boxes + self.subtract_button_timers + self.timers + self.add_button_timers + self.step_message_array
-
+        widgets_to_remove = self.tab3_text_boxes + self.subtract_button_timers + self.timers + self.add_button_timers + self.step_message_array + self.title_textbox_array
+        text_boxes_counter = 0
         # Remove old textboxes
         for widget in widgets_to_remove:
             widget.destroy()
@@ -284,30 +279,41 @@ class RegistrationDef(customtkinter.CTk):
                 self.add_button_timers.remove(widget)
             if widget in self.step_message_array:
                 self.step_message_array.remove(widget)
+            if widget in self.title_textbox_array:
+                self.title_textbox_array.remove(widget)
 
         number_of_rec = int(self.slider.get())
 
         # Create new textboxes
         for i in range(number_of_rec):
-            textbox = customtkinter.CTkEntry(self.tab_frame, width=100, font=('Arial', 12), height=100)
-            textbox.grid(row=8 + i, column=0, columnspan=5, pady=(100, 30), padx=(1, 1), sticky="nsew")
+            text_boxes_counter += 1
+            textbox = customtkinter.CTkEntry(self.tab_frame, width=830, font=('Arial', 12), height=100)
+            textbox.grid(row=8 + i, column=0, columnspan=5, pady=(20, 20), padx=(1, 1))
+
+            title_textbox = customtkinter.CTkEntry(self.tab_frame, width=300, font=('Arial', 12), height=50,
+                                                   corner_radius=18,
+                                                   placeholder_text=f"        "
+                                                                    f"        "
+                                                                    f"Please enter the title of {i + 1} step:")
+            title_textbox.grid(row=8 + i, column=0, columnspan=5, pady=(50, 300), padx=(20, 1))
+
             step_message = customtkinter.CTkLabel(self.tab_frame, text=f"Please enter the {i + 1} step:",
                                                   font=('Arial', 14))
-            step_message.grid(row=8 + i, column=0, padx=(1, 100), pady=(1, 80), sticky="w")
+            step_message.grid(row=8 + i, column=0, padx=(1, 100), pady=(1, 130), sticky="w")
             subtract_button_third_step = customtkinter.CTkButton(self.tab_frame, text="-", width=100 - 6, height=32 - 6,
                                                                  command=lambda index=i: self.subtract_button_callback(
                                                                      index))
-            subtract_button_third_step.grid(row=9 + i, column=0, padx=(1, 170), pady=(1, 180))
+            subtract_button_third_step.grid(row=8 + i, column=0, padx=(1, 170), pady=(250, 1))
 
             entry_third_step = customtkinter.CTkEntry(self.tab_frame, width=180 - (2 * 32), height=32 - 6,
                                                       border_width=0)
 
-            entry_third_step.grid(row=9 + i, column=0, padx=(40, 1), pady=(1, 180))
+            entry_third_step.grid(row=8 + i, column=0, padx=(40, 1), pady=(250, 1))
             entry_third_step.insert(0, f"          0:00")
 
             add_button_third_step = customtkinter.CTkButton(self.tab_frame, text="+", width=100 - 6, height=32 - 6,
                                                             command=lambda index=i: self.add_button_callback(index))
-            add_button_third_step.grid(row=9 + i, column=0, padx=(228, 1), pady=(1, 180))
+            add_button_third_step.grid(row=8 + i, column=0, padx=(228, 1), pady=(250, 1))
             # default value
 
             self.timers.append(entry_third_step)
@@ -315,6 +321,8 @@ class RegistrationDef(customtkinter.CTk):
             self.add_button_timers.append(add_button_third_step)
             self.tab3_text_boxes.append(textbox)
             self.step_message_array.append(step_message)
+            self.title_textbox_array.append(title_textbox)
+            self.counter_of_text_boxes = text_boxes_counter
 
     def add_button_callback(self, index):
         if self.command is not None:
@@ -411,9 +419,14 @@ class RegistrationDef(customtkinter.CTk):
         self.category_box.configure(values=categories)
 
     def return_to_menu(self):
+        x = self.winfo_x()
+        y = self.winfo_y()
+        registration_width = self.winfo_width()
+        counter = None
+        registration_height = self.winfo_height()
         self.destroy()
         from Menu import Menu
-        self.back = Menu()
+        self.back = Menu(x, y, registration_width, registration_height, counter)
         self.back.mainloop()
 
     def save_registration(self):
@@ -428,12 +441,14 @@ class RegistrationDef(customtkinter.CTk):
             # Special string arguments used to represent the starting and ending positions of a text widget's content.
         else:
             # Save recipe and close window
+            counter = self.counter_of_text_boxes
+            x = self.winfo_x()
+            y = self.winfo_y()
+            registration_width = self.winfo_width()
+            registration_height = self.winfo_height()
             self.destroy()
             from Menu import Menu
-            self.back = Menu()
+            self.back = Menu(x, y, registration_width, registration_height, counter)
             self.back.mainloop()
 
 
-if __name__ == "__main__":
-    app = RegistrationDef()
-    app.mainloop()

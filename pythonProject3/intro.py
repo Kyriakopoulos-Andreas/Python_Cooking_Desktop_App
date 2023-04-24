@@ -3,12 +3,14 @@ from Menu import Menu
 
 
 
+from imports import *
+from Menu import Menu
+
 class Intro(customtkinter.CTk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.menu = None
         self.title("Let's Cook")
-
 
         # Set window size
         self.overrideredirect(False)  # to allow for the window decorations
@@ -17,6 +19,7 @@ class Intro(customtkinter.CTk):
         x = int(self.winfo_screenwidth() / 2 - width / 2 + 25)
         y = int(self.winfo_screenheight() / 2 - height / 2 - 40)
         self.geometry("{0}x{1}+{2}+{3}".format(width, height, x, y))
+
         self.resizable(True, True)
         self.iconbitmap(r"C:\Users\Admin\Desktop\logo\image.ico")
         self.image = Image.open(r"C:\Users\Admin\Desktop\logo\cook.jpg")
@@ -39,14 +42,24 @@ class Intro(customtkinter.CTk):
         self.LetS_Cook_Button = customtkinter.CTkButton(self, text="Let's Cook", width=200, height=40, image=self.photo,
                                                         corner_radius=2, text_color='Black', fg_color="#A4A4A4",
                                                         font=('Arial', 20),
-                                                        command=self.show_second_window)
+                                                        command=self.on_close)
         self.LetS_Cook_Button.grid(row=1, column=1, padx=0, pady=0)
 
+        self.protocol('WM_DELETE_WINDOW', self.on_close)
+
+    def on_close(self):
+        # Get the size and position of the Intro window
+        intro_width = self.winfo_width()
+        intro_height = self.winfo_height()
+        intro_x = self.winfo_x()
+        intro_y = self.winfo_y()
+        counter = None
+
+        if self.menu is None:
+            self.destroy()  # Destroy the Intro window
+            self.menu = Menu(intro_x, intro_y, intro_width, intro_height, counter
+                             )  # Pass size and position to Menu
+            self.menu.mainloop()
 
 
 
-
-    def show_second_window(self):
-        self.destroy()
-        self.menu = Menu()
-        self.menu.mainloop()

@@ -1,12 +1,12 @@
 from imports import *
-from Registration import RegistrationDef
+from Registration import Registration
 from Word_cuisine import Word_cuisine
 from Recipe_search import Recipe_search
 
 
 
 class Menu(customtkinter.CTk):
-    def __init__(self):
+    def __init__(self, prev_x, prev_y, intro_width, intro_height, counter):
         super().__init__()
 
         self.recipe_search_window = None
@@ -27,17 +27,14 @@ class Menu(customtkinter.CTk):
         self.mid_frame = None
         self.tittle = None
         self.pop_up = None
+        self.counter = counter
 
         self.dialog = None
         self.search = customtkinter.StringVar()
         self.title("Let's Cook")
 
-        self.overrideredirect(False)  # to allow for the window decorations
-        width = int(self.winfo_screenwidth() * 1.039)
-        height = int(self.winfo_screenheight() * 0.941)
-        x = int(self.winfo_screenwidth() / 2 - width / 2 + 25)
-        y = int(self.winfo_screenheight() / 2 - height / 2 - 40)
-        self.geometry("{0}x{1}+{2}+{3}".format(width, height, x, y))
+        self.geometry("{0}x{1}+{2}+{3}".format(intro_width, intro_height,prev_x, prev_y,))
+
         self.resizable(True, True)
         self.iconbitmap(r"C:\Users\Admin\Desktop\logo\image.ico")
 
@@ -97,9 +94,19 @@ class Menu(customtkinter.CTk):
         self.option_button.grid(row=7, column=0, padx=5, pady=20, sticky="s")
 
     def search_button_click(self):
+        # Get the position and size of the current window
+        prev_x = self.winfo_x()
+        prev_y = self.winfo_y()
+        intro_width = self.winfo_width()
+        intro_height = self.winfo_height()
+
+        # Destroy the current window
         self.destroy()
-        self.recipe_search_window = Recipe_search()
-        
+
+        # Create a new instance of Recipe_search with the position and size information
+        self.recipe_search_window = Recipe_search(prev_x, prev_y, intro_width, intro_height, self.counter)
+
+        # Start the main loop for the new window
         self.recipe_search_window.mainloop()
         
 
@@ -114,10 +121,20 @@ class Menu(customtkinter.CTk):
         customtkinter.set_appearance_mode(new_appearance_mode)
 
     def registration_window(self):
-        self.destroy()
-        self.pop_up = RegistrationDef()
+        # Get the position and size of the current window
+        prev_x = self.winfo_x()
+        prev_y = self.winfo_y()
+        intro_width = self.winfo_width()
+        intro_height = self.winfo_height()
 
-        self.pop_up.mainloop()
+        # Destroy the current window
+        self.destroy()
+
+        # Create a new instance of RegistrationDef with the position and size information
+        self.registration_window = Registration(prev_x, prev_y, intro_width, intro_height)
+
+        # Start the main loop for the new window
+        self.registration_window.mainloop()
 
     def word_cuisine(self):
         self.information_window = Word_cuisine()
@@ -125,6 +142,3 @@ class Menu(customtkinter.CTk):
 
 
 
-if __name__ == "__main__":
-    app = Menu()
-    app.mainloop()
