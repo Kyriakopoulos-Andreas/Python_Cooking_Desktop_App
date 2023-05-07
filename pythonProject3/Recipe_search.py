@@ -5,10 +5,17 @@ from tkinter import ttk
 
 
 class Recipe_search(customtkinter.CTk):
+
     def __init__(self, prev_x, prev_y, intro_width, intro_height, number_of_text_boxes):
         super().__init__()
 
         # Set window size to full screen
+        self.new_index = None
+        self.new_step_button = None
+        self.new_step_title = None
+        self.steps_created = False
+        self.text_box_visible = False
+        self.text_box_created = False
         self.step_button_clicks = 0
         self.delete_buttons = []
         self.subtract_button_third_step = None
@@ -19,7 +26,7 @@ class Recipe_search(customtkinter.CTk):
         self.delete_step_photo = None
         self.delete_step_img = None
         self.add_button_third_step = None
-        self.text_boxes_counter = None
+        self.stepp_counter = None
         self.counter_of_text_boxes = None
         self.current_timer_index = None
         self.tab3_text_boxes = []
@@ -58,7 +65,7 @@ class Recipe_search(customtkinter.CTk):
         self.mexican_categories = None
         self.chinese_categories = None
         self.combobox = None
-        self.text_boxes_counter = 0
+        self.stepp_counter = 0
         self.geometry("{0}x{1}+{2}+{3}".format(intro_width, intro_height, prev_x, prev_y))
         self.text_boxes = number_of_text_boxes
         self.steps_visible = False
@@ -145,7 +152,7 @@ class Recipe_search(customtkinter.CTk):
 
         self.cook_button = customtkinter.CTkButton(self.bottom_frame, text="Let's Cook", image=self.photo,
                                                    width=130, height=40, corner_radius=15,
-                                                   )
+                                                   command=self.lets_cook_window)
         self.cook_button.grid(row=0, column=2, padx=(1, 1), pady=(30, 30), sticky="nsew")
 
         self.search_img = Image.open(r"C:\Users\Admin\Desktop\logo\search.png")
@@ -443,6 +450,7 @@ class Recipe_search(customtkinter.CTk):
 
     def create_text_boxes(self):
 
+
         if self.steps_visible:
             # Hide the steps
             for textbox in self.tab3_text_boxes:
@@ -459,43 +467,79 @@ class Recipe_search(customtkinter.CTk):
                 delete_button.grid_forget()
             for timer in self.timers:
                 timer.grid_forget()
+            self.new_step_title.grid_forget()
+            self.new_step_button.grid_forget()
             self.steps_visible = False
         else:
-        # Create new textboxes
+            # Show the steps
+            for i, textbox in enumerate(self.tab3_text_boxes):
+                textbox.grid(row=12 + i, column=0, pady=(150, 100), padx=(550, 1), sticky="w")
+            for i, button in enumerate(self.subtract_button_timers):
+                button.grid(row=12 + i, column=0, padx=(103, 1), pady=(350, 1))
+            for i, button in enumerate(self.add_button_timers):
+                button.grid(row=12 + i, column=0, padx=(985, 1), pady=(350, 1))
+            for i, message in enumerate(self.step_message_array):
+                message.grid(row=12 + i, column=0, padx=(350, 1), pady=(1, 130), sticky="w")
+            for i, title_textbox in enumerate(self.title_textbox_array):
+                title_textbox.grid(row=12 + i, column=0, pady=(100, 385), padx=(555, 1))
+            for i, delete_button in enumerate(self.delete_buttons):
+                delete_button.grid(row=12 + i, column=1, padx=(1, 1), pady=(40, 1), sticky="e")
+            for i, timer in enumerate(self.timers):
+                timer.grid(row=12 + i, column=0, padx=(543, 1), pady=(350, 1))
+
+            self.new_step_title = customtkinter.CTkLabel(self.scrollable_frame, text="Step Addition:",
+                                                         font=('Century Gothic', 30))
+            self.new_step_title.grid(row=11, column=0, padx=(350, 1), pady=(50, 1), sticky="nw")
+
+            self.new_step_button = customtkinter.CTkButton(self.scrollable_frame, text="Add Step", width=280,
+                                                           height=33,
+                                                           corner_radius=15,
+                                                           command=self.add_new_step)
+            self.new_step_button.grid(column=0, row=11, padx=(1, 205), pady=(1, 1), sticky="se")
+            self.steps_visible = True
+            # Create new textboxes
+        if not self.steps_created:
             for i, _ in enumerate(range(5)):
-                self.text_boxes_counter += 1
+                self.stepp_counter += 1
                 self.textbox = customtkinter.CTkEntry(self.scrollable_frame, width=670, font=('Arial', 12), height=150)
-                self.textbox.grid(row=11 + i, column=0,  pady=(150, 100), padx=(550, 1), sticky="w")
+                self.textbox.grid(row=12 + i, column=0, pady=(150, 100), padx=(550, 1), sticky="w")
 
-                self.title_textbox = customtkinter.CTkEntry(self.scrollable_frame, width=400, font=('Arial', 12), height=50,
-                                                   corner_radius=18)
-                self.title_textbox.grid(row=11 + i, column=0,  pady=(100, 385), padx=(555, 1))
+                self.title_textbox = customtkinter.CTkEntry(self.scrollable_frame, width=400, font=('Arial', 12),
+                                                            height=50,
+                                                            corner_radius=18)
+                self.title_textbox.grid(row=12 + i, column=0, pady=(100, 385), padx=(555, 1))
 
-                self.step_message = customtkinter.CTkLabel(self.scrollable_frame, text=f"Please enter the {i + 1} step:",
-                                                  font=('bold', 18))
-                self.step_message.grid(row=11 + i, column=0, padx=(350, 1), pady=(1, 130), sticky="w")
-                self.subtract_button_third_step = customtkinter.CTkButton(self.scrollable_frame, text="-", width=100 - 6, height=32 - 6,
-                                                                 command=lambda index=i: self.subtract_button_callback(
-                                                                     index))
-                self.subtract_button_third_step.grid(row=11 + i, column=0, padx=(103, 1), pady=(350, 1))
+                self.step_message = customtkinter.CTkLabel(self.scrollable_frame,
+                                                           text=f"Please edit the {i + 1} step:",
+                                                           font=('bold', 18))
+                self.step_message.grid(row=12 + i, column=0, padx=(350, 1), pady=(1, 130), sticky="w")
+                self.subtract_button_third_step = customtkinter.CTkButton(self.scrollable_frame, text="-",
+                                                                          width=100 - 6, height=32 - 6,
+                                                                          command=lambda
+                                                                              index=i: self.subtract_button_callback(
+                                                                              index))
+                self.subtract_button_third_step.grid(row=12 + i, column=0, padx=(103, 1), pady=(350, 1))
 
                 self.entry_third_step = customtkinter.CTkEntry(self.scrollable_frame, width=350, height=32 - 6,
-                                                      border_width=0)
+                                                               border_width=0)
 
-                self.entry_third_step.grid(row=11 + i, column=0, padx=(543, 1), pady=(350, 1))
+                self.entry_third_step.grid(row=12 + i, column=0, padx=(543, 1), pady=(350, 1))
                 self.entry_third_step.insert(0, f"{' ':>50}0:00")
 
-                self.add_button_third_step = customtkinter.CTkButton(self.scrollable_frame, text="+", width=100 - 6, height=32 - 6,
-                                                            command=lambda index=i: self.add_button_callback(index))
-                self.add_button_third_step.grid(row=11 + i, column=0, padx=(985, 1), pady=(350, 1))
+                self.add_button_third_step = customtkinter.CTkButton(self.scrollable_frame, text="+", width=100 - 6,
+                                                                     height=32 - 6,
+                                                                     command=lambda index=i: self.add_button_callback(
+                                                                         index))
+                self.add_button_third_step.grid(row=12 + i, column=0, padx=(985, 1), pady=(350, 1))
 
                 self.delete_step_img = Image.open(r"C:\Users\Admin\Desktop\logo\x.png")
                 self.delete_step_img = self.delete_img.resize((24, 24))
                 self.delete_step_photo = customtkinter.CTkImage(self.delete_step_img)
-                self.delete_button = customtkinter.CTkButton(self.scrollable_frame, text="", width=100 - 6, height=32 - 6,
-                                                    command=lambda index=i: self.delete_button_callback(index),
-                                                    corner_radius=12, image=self.delete_step_photo)
-                self.delete_button.grid(row=11 + i, column=1, padx=(1, 1), pady=(40, 1), sticky="e")
+                self.delete_button = customtkinter.CTkButton(self.scrollable_frame, text="", width=100 - 6,
+                                                             height=32 - 6,
+                                                             command=lambda index=i: self.delete_button_callback(index),
+                                                             corner_radius=12, image=self.delete_step_photo)
+                self.delete_button.grid(row=12 + i, column=1, padx=(1, 1), pady=(40, 1), sticky="e")
                 self.delete_buttons.append(self.delete_button)
                 # default value
 
@@ -506,12 +550,61 @@ class Recipe_search(customtkinter.CTk):
                 self.step_message_array.append(self.step_message)
                 self.title_textbox_array.append(self.title_textbox)
                 self.steps_visible = True
+                self.steps_created = True
+
+
+    def add_new_step(self):
+        new_index = self.stepp_counter  # determine index of new step
+        self.stepp_counter += 1
+
+
+        # create new widgets for step
+        self.textbox = customtkinter.CTkEntry(self.scrollable_frame, width=670, font=('Arial', 12), height=150)
+        self.textbox.grid(row=1 + 12 + new_index, column=0, pady=(150, 100), padx=(550, 1), sticky="w")
+
+        self.title_textbox = customtkinter.CTkEntry(self.scrollable_frame, width=400, font=('Arial', 12), height=50,
+                                               corner_radius=18)
+        self.title_textbox.grid(row=1 + 12 + new_index, column=0, pady=(100, 385), padx=(555, 1))
+
+        self.step_message = customtkinter.CTkLabel(self.scrollable_frame, text=f"Please edit the {new_index + 1} step:",
+                                              font=('bold', 18))
+        self.step_message.grid(row=1 + 12 + new_index, column=0, padx=(350, 1), pady=(1, 130), sticky="w")
+
+        self.subtract_button_third_step = customtkinter.CTkButton(self.scrollable_frame, text="-", width=100 - 6,
+                                                             height=32 - 6, command=lambda
+                index=new_index: self.subtract_button_callback(index))
+        self.subtract_button_third_step.grid(row=1 + 12 + new_index, column=0, padx=(103, 1), pady=(350, 1))
+
+        self.entry_third_step = customtkinter.CTkEntry(self.scrollable_frame, width=350, height=32 - 6, border_width=0)
+        self.entry_third_step.grid(row=1 + 12 + new_index, column=0, padx=(543, 1), pady=(350, 1))
+        self.entry_third_step.insert(0, f"{' ':>50}0:00")
+
+        self.add_button_third_step = customtkinter.CTkButton(self.scrollable_frame, text="+", width=100 - 6, height=32 - 6,
+                                                        command=lambda index=new_index: self.add_button_callback(index))
+        self.add_button_third_step.grid(row=1 + 12 + new_index, column=0, padx=(985, 1), pady=(350, 1))
+
+        self.delete_step_img = Image.open(r"C:\Users\Admin\Desktop\logo\x.png")
+        self.delete_step_img = self.delete_img.resize((24, 24))
+        self.delete_step_photo = customtkinter.CTkImage(self.delete_step_img)
+        self.delete_button = customtkinter.CTkButton(self.scrollable_frame, text="", width=100 - 6, height=32 - 6,
+                                                command=lambda index=new_index: self.delete_button_callback(index),
+                                                corner_radius=12, image=self.delete_step_photo)
+        self.delete_button.grid(row=1 + 12 + new_index, column=1, padx=(1, 1), pady=(40, 1), sticky="e")
+        self.delete_buttons.append(self.delete_button)
+
+        # add new widgets to appropriate arrays
+        self.timers.append(self.entry_third_step)
+        self.subtract_button_timers.append(self.subtract_button_third_step)
+        self.add_button_timers.append(self.add_button_third_step)
+        self.tab3_text_boxes.append(self.textbox)
+        self.step_message_array.append(self.step_message)
+        self.title_textbox_array.append(self.title_textbox)
 
     def delete_button_callback(self, index):
         # Remove the step at the given index from the recipe
 
         print("Index:", index)
-        print("Length of timers:", len(self.timers) - 1)
+        print("Length of timers:", len(self.timers))
 
         # Remove the widgets for the step from the GUI
         print("Length of subtract_button_timers:", len(self.subtract_button_timers))
@@ -529,13 +622,20 @@ class Recipe_search(customtkinter.CTk):
         del self.tab3_text_boxes[index]
         del self.step_message_array[index]
         del self.title_textbox_array[index]
-        del self.delete_buttons[index]
         del self.timers[index]
-        self.text_boxes_counter -= 1
+        del self.delete_buttons[index]  # remove corresponding delete button from self.delete_buttons
 
-        # Update the remaining step messages to reflect their new order
+        # Update the indices of the remaining steps
+        self.stepp_counter -= 1
         for i in range(index, len(self.step_message_array)):
-            self.step_message_array[i].configure(text=f"Please enter the {i + 1} step:")
+            self.step_message_array[i].configure(text=f"Please edit the {i + 1} step:")
+            self.timers[i].grid(row=12 + i + 1, column=0, padx=(543, 1), pady=(350, 1))
+            self.subtract_button_timers[i].grid(row=12 + i + 1, column=0, padx=(103, 1), pady=(350, 1))
+            self.add_button_timers[i].grid(row=12 + i + 1, column=0, padx=(985, 1), pady=(350, 1))
+            self.tab3_text_boxes[i].grid(row=12 + i + 1, column=0, pady=(150, 100), padx=(550, 1), sticky="w")
+            self.step_message_array[i].grid(row=12 + i + 1, column=0, padx=(350, 1), pady=(1, 130), sticky="w")
+            self.title_textbox_array[i].grid(row=12 + i + 1, column=0, pady=(100, 385), padx=(555, 1))
+            self.delete_buttons[i].grid(row=12 + i + 1, column=1, padx=(1, 1), pady=(40, 1), sticky="e")
 
         # Update the callbacks for the remaining buttons
         for i, button in enumerate(self.subtract_button_timers):
@@ -544,6 +644,8 @@ class Recipe_search(customtkinter.CTk):
             button.configure(command=lambda index=i: self.add_button_callback(index))
         for i, button in enumerate(self.delete_buttons):
             button.configure(command=lambda index=i: self.delete_button_callback(index))
+
+
 
     def add_button_callback(self, index):
         if self.command is not None:
@@ -578,12 +680,19 @@ class Recipe_search(customtkinter.CTk):
                 pass
 
     def ingredients_text_box(self):
-        self.ingredients_textbox = customtkinter.CTkTextbox(self.scrollable_frame, width=200, corner_radius=12,
-                                                            height=265, border_width=5, border_spacing=25,
-                                                            border_color=("#3673F8", "orange"),
-                                                            scrollbar_button_color=("#3673F8", "orange"),
-                                                            font=('Arial', 24))
-        self.ingredients_textbox.grid(row=9, column=0, padx=(525, 1), pady=(1, 1), sticky="nsew")
+        if self.text_box_visible:
+            self.ingredients_textbox.grid_forget()  # hide the text box
+            self.text_box_visible = False
+        else:
+            if not self.text_box_created:
+                self.ingredients_textbox = customtkinter.CTkTextbox(self.scrollable_frame, width=200, corner_radius=12,
+                                                                    height=265, border_width=5, border_spacing=25,
+                                                                    border_color=("#3673F8", "orange"),
+                                                                    scrollbar_button_color=("#3673F8", "orange"),
+                                                                    font=('Arial', 24))
+                self.text_box_created = True
+            self.ingredients_textbox.grid(row=9, column=0, padx=(525, 1), pady=(1, 1), sticky="nsew")
+            self.text_box_visible = True
 
     def step1_time_changer(self, increment):
         try:
@@ -619,6 +728,14 @@ class Recipe_search(customtkinter.CTk):
         self.center_frame.grid()  # Show the center frame
         self.editing_frame.grid_remove()  # Hide the dok_frame
         self.save_changes_button.grid_remove()  # Hide the dok_button
+
+    def lets_cook_window(self):
+        from Lets_Cook import Lets_Cook
+        self.center_frame.grid_remove()
+        self.left_frame.grid_remove()
+        Lets_Cook(self)
+
+
 
 
 

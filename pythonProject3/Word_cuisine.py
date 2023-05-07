@@ -14,6 +14,7 @@ class Word_cuisine(customtkinter.CTk):
 
         self.iconbitmap(r"C:\Users\Admin\Desktop\logo\image.ico")
         self.title("Let's Cook-Word Cuisine")
+        self.resizable(False, False)
         # Center the window on the screen
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()

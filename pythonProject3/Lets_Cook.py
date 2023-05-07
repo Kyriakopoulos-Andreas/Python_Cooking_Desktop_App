@@ -26,6 +26,7 @@ class Lets_Cook(customtkinter.CTk):
                                                            width=70, height=30,
                                                            corner_radius=15,
                                                            command=self.back)
+        self.back_editing_button.grid(row=4, column=0,  padx=(1, 10), pady=(1, 1), sticky="nse")
         self.right_button = customtkinter.CTkButton(self.center_frame, text="     Next Step    ",
                                                     font=('Arial', 18, 'bold'),
                                                     height=27, width=30, corner_radius=100)
