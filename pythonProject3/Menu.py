@@ -68,15 +68,16 @@ class Menu(customtkinter.CTk):
                                                command=self.registration_window,
                                                width=120, height=40)
         self.button1.grid(row=1, column=0, padx=20, pady=(80, 20), )
-        self.button2 = customtkinter.CTkButton(self.left_frame, text="Editing", width=130, height=40)
+        self.button2 = customtkinter.CTkButton(self.left_frame, text="Recipe Search", width=130, height=40,
+                                               command=self.search_button_click)
         self.button2.grid(row=2, column=0, padx=20, pady=10 )
         # Search window button
-        self.search_button = customtkinter.CTkButton(self.left_frame, text="Recipe Search", width=130, height=40,
-                                                     command=self.search_button_click)
+        self.search_button = customtkinter.CTkButton(self.left_frame, text="Word's Cuisines", width=130, height=40,
+                                                    command=self.word_cuisine)
         self.search_button.grid(row=3, column=0, padx=0, pady=20, )
         # Delete Button
-        self.button3 = customtkinter.CTkButton(self.left_frame, text="Word's Cuisines",
-                                               width=130, height=40, command=self.word_cuisine)
+        self.button3 = customtkinter.CTkButton(self.left_frame, text="About Us",
+                                               width=130, height=40)
         self.button3.grid(row=4, column=0, padx=0, pady=10, )
 
         # exit button

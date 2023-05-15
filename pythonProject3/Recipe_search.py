@@ -71,7 +71,6 @@ class Recipe_search(customtkinter.CTk):
         self.steps_visible = False
 
 
-        self.title("Registration")
         self.filter_counter = 0
 
         self.iconbitmap(r"C:\Users\Admin\Desktop\logo\image.ico")
@@ -375,7 +374,7 @@ class Recipe_search(customtkinter.CTk):
 
         self.editing_title = customtkinter.CTkLabel(self.editing_frame, text="Editing Recipe",
                                                     font=('Century Gothic', 24))
-        self.editing_title.grid(row=1, column=1, columnspan=4, padx=(1, 1), pady=(10, 1), sticky="n")
+        self.editing_title.grid(row=1, column=1, columnspan=4, padx=(80, 1), pady=(10, 1), sticky="n")
 
         self.save_changes_button = customtkinter.CTkButton(self.editing_frame, text="Save Changes", width=70, height=35,
                                                            corner_radius=15,
@@ -724,10 +723,60 @@ class Recipe_search(customtkinter.CTk):
             self.step1_time_changer(-self.step_size)
 
     def save_changes(self):
-        self.left_frame.grid()
-        self.center_frame.grid()  # Show the center frame
-        self.editing_frame.grid_remove()  # Hide the dok_frame
-        self.save_changes_button.grid_remove()  # Hide the dok_button
+
+        if self.Recipe_name.get() == "":
+            # Display message to user that recipe name is empty
+            messagebox.showerror("Error", "Recipe name cannot be empty.")
+        elif self.entry.get() == f"{' ':>68}0:00":
+
+            # Display message to user that textbox is empty
+            messagebox.showerror("Error", "Recipe time cannot be empty.")
+            # Special string arguments used to represent the starting and ending positions of a text widget's content.
+        elif hasattr(self, "ingredients_textbox") and \
+                self.ingredients_textbox is not None and self.ingredients_textbox.get("1.0", "end-1c") == "":
+            # Display message to user that ingredients are empty
+            messagebox.showerror("Error", "Ingredients cannot be empty.")
+
+        elif not self.step_message_array:
+
+            # Display message to user that textbox is empty
+            messagebox.showerror("Error", "Recipe Steps can not be zero.")
+        else:
+            for textbox in self.tab3_text_boxes:
+                if textbox.get() == "":
+                    # Display message to user that textbox is empty
+                    messagebox.showerror("Error", "Step cannot be empty.")
+                    return  # Stop execution if any textbox is empty
+
+            # Check for empty title text boxes
+            for title_textbox in self.title_textbox_array:
+                if title_textbox.get() == "":
+                    # Display message to user that title textbox is empty
+                    messagebox.showerror("Error", "Step Title  cannot be empty.")
+                    return  # Stop execution if any title textbox is empty
+
+            for timer in self.timers:
+                if timer.get() == "" or timer.get() == f"{' ':>50}0:00":
+                    # Display message to user that title textbox is empty
+                    messagebox.showerror("Error", "Step Timer cannot be zero.")
+                    return
+
+            self.left_frame.grid()
+            self.center_frame.grid()  # Show the center frame
+            self.editing_frame.destroy()  # Hide the dok_frame
+            self.save_changes_button.destroy()  # Hide the dok_button
+            self.timers = []
+            self.subtract_button_timers = []
+            self.add_button_timers = []
+            self.tab3_text_boxes = []
+            self.step_message_array = []
+            self.title_textbox_array = []
+            self.delete_buttons = []
+            self.steps_created = False
+            self.steps_visible = False
+            self.text_box_visible = False
+            self.text_box_created = False
+
 
     def lets_cook_window(self):
         from Lets_Cook import Lets_Cook

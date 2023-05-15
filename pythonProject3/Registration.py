@@ -9,10 +9,10 @@ class Registration(customtkinter.CTk):
         self.extra_title2 = None
         self.entry_third_step = None
         self.extra_title = None
-        self.tab3_text_boxes = []
+        self.step_entry_boxes = []
         self.timers = []
         self.subtract_button_timers = []
-        self.title_textbox_array = []
+        self.step_title_boxes = []
         self.add_button_timers = []
         self.step_message_array = []
         self.back = None
@@ -71,18 +71,19 @@ class Registration(customtkinter.CTk):
                                                    height=27, width=150, corner_radius=7, command=self.return_to_menu)
         self.Back_Button.grid(row=0, column=0, sticky="nw")
 
-        self.combobox = customtkinter.CTkOptionMenu(self.tabview.tab("step 1"), width=400, height=25, corner_radius=10,
-                                                    dropdown_hover_color="#A4A4A4", dynamic_resizing=False,
-                                                    dropdown_font=('bold', 18), font=('Arial', 18, 'bold'),
-                                                    command=self.display_categories,
-                                                    values=[
+        self.cuisine_box = customtkinter.CTkOptionMenu(self.tabview.tab("step 1"), width=400, height=25, corner_radius=10,
+                                                       dropdown_hover_color="#A4A4A4", dynamic_resizing=False,
+                                                       dropdown_font=('bold', 18), font=('Arial', 18, 'bold'),
+                                                       command=self.display_categories,
+                                                       values=[
                                                         f"{'Mediterranean':^65}",
                                                         f"{'Chinese':^70}",
                                                         f"{'Mexican':^70}",
                                                         f"{'Arabic':^70}",
                                                         f"{'Thai':^70}"])
 
-        self.combobox.grid(row=1, column=0, padx=(380, 90), pady=(20, 60), sticky="s")
+        self.cuisine_box.grid(row=1, column=0, padx=(380, 90), pady=(20, 60), sticky="s")
+        self.cuisine_box.set(f"{'Choose Cuisine':>40}")
 
         self.chinese_categories = ["BaoBan", "Noodles", "Sushi", "Ramen", "Soups", "Rice Dish", "Bowl",
                                    "Street Food"]
@@ -137,6 +138,7 @@ class Registration(customtkinter.CTk):
                                                               f"{'Difficult':^88}",
                                                           ], )
         self.difficulty_box.grid(row=4, column=0, padx=(315, 1), pady=(10, 1), sticky="s")
+        self.difficulty_box.set(f"{'Choose Level':>47}")
 
         self.Recipe_name = customtkinter.CTkEntry(self.tabview.tab("step 1"),
                                                   placeholder_text="                    "
@@ -152,15 +154,15 @@ class Registration(customtkinter.CTk):
                                                        command=self.step1_subtract)
         self.subtract_button.grid(row=7, column=0, padx=(174, 200), pady=3)
 
-        self.entry = customtkinter.CTkEntry(self.tabview.tab("step 1"), width=250, height=26,
-                                            border_width=0)
-        self.entry.grid(row=7, column=0, padx=(570, 1), pady=1, sticky="w")
+        self.time_displayer = customtkinter.CTkEntry(self.tabview.tab("step 1"), width=250, height=26,
+                                                     border_width=0)
+        self.time_displayer.grid(row=7, column=0, padx=(570, 1), pady=1, sticky="w")
 
         self.add_button = customtkinter.CTkButton(self.tabview.tab("step 1"), text="+", width=100 - 6, height=32 - 6,
                                                   command=self.step1_add)
         self.add_button.grid(row=7, column=0, padx=(580, 1), pady=3)
         # default value
-        self.entry.insert(0, "                             0:00")
+        self.time_displayer.insert(0, "                             0:00")
 
         # Titles
         self.tittle = customtkinter.CTkLabel(self.main_frame, text="Registration Recipe", font=('Century Gothic', 20))
@@ -264,23 +266,23 @@ class Registration(customtkinter.CTk):
                                                    font=('Century Gothic', 12))
         self.extra_title2.grid(row=7, column=0, columnspan=4, padx=(1, 1), pady=(1, 1), sticky="nsew")
 
-        widgets_to_remove = self.tab3_text_boxes + self.subtract_button_timers + self.timers + self.add_button_timers + self.step_message_array + self.title_textbox_array
+        widgets_to_remove = self.step_entry_boxes + self.subtract_button_timers + self.timers + self.add_button_timers + self.step_message_array + self.step_title_boxes
         text_boxes_counter = 0
         # Remove old textboxes
         for widget in widgets_to_remove:
             widget.destroy()
             if widget in self.timers:
                 self.timers.remove(widget)
-            if widget in self.tab3_text_boxes:
-                self.tab3_text_boxes.remove(widget)
+            if widget in self.step_entry_boxes:
+                self.step_entry_boxes.remove(widget)
             if widget in self.subtract_button_timers:
                 self.subtract_button_timers.remove(widget)
             if widget in self.add_button_timers:
                 self.add_button_timers.remove(widget)
             if widget in self.step_message_array:
                 self.step_message_array.remove(widget)
-            if widget in self.title_textbox_array:
-                self.title_textbox_array.remove(widget)
+            if widget in self.step_title_boxes:
+                self.step_title_boxes.remove(widget)
 
         number_of_rec = int(self.slider.get())
 
@@ -319,9 +321,9 @@ class Registration(customtkinter.CTk):
             self.timers.append(entry_third_step)
             self.subtract_button_timers.append(subtract_button_third_step)
             self.add_button_timers.append(add_button_third_step)
-            self.tab3_text_boxes.append(textbox)
+            self.step_entry_boxes.append(textbox)
             self.step_message_array.append(step_message)
-            self.title_textbox_array.append(title_textbox)
+            self.step_title_boxes.append(title_textbox)
             self.counter_of_text_boxes = text_boxes_counter
 
     def add_button_callback(self, index):
@@ -358,7 +360,7 @@ class Registration(customtkinter.CTk):
 
     def step1_time_changer(self, increment):
         try:
-            current_value = self.entry.get()
+            current_value = self.time_displayer.get()
             hours, minutes = map(int, current_value.split(':'))
             current_time = timedelta(hours=hours, minutes=minutes)
             new_time = current_time + timedelta(minutes=increment)
@@ -370,8 +372,8 @@ class Registration(customtkinter.CTk):
             hours, minutes = divmod(new_time.seconds // 60, 60)
             formatted_time = f"{hours:30}:{minutes:02}"
 
-            self.entry.delete(0, "end")
-            self.entry.insert(0, formatted_time)
+            self.time_displayer.delete(0, "end")
+            self.time_displayer.insert(0, formatted_time)
         except ValueError:
             pass
 
@@ -398,7 +400,7 @@ class Registration(customtkinter.CTk):
             self.textbox.unbind("<FocusIn>", None)
 
     def display_categories(self, event):
-        selected_cuisine = self.combobox.get().strip()
+        selected_cuisine = self.cuisine_box.get().strip()
 
         categories = []
 
@@ -439,7 +441,44 @@ class Registration(customtkinter.CTk):
             # Display message to user that textbox is empty
             messagebox.showerror("Error", "Textbox cannot be empty.")
             # Special string arguments used to represent the starting and ending positions of a text widget's content.
+        elif self.cuisine_box.get() == f"{'Choose Cuisine':>40}":
+            # Display message to user that recipe name is empty
+            messagebox.showerror("Error", "Recipe Cuisine cannot be empty.")
+        elif self.category_box.get() == f"{'Choose Category':>48}":
+            # Display message to user that recipe name is empty
+            messagebox.showerror("Error", "Recipe Category cannot be empty.")
+
+        elif self.difficulty_box.get() == f"{'Choose Level':>47}":
+            # Display message to user that recipe name is empty
+            messagebox.showerror("Error", "Recipe Level cannot be empty.")
+
+        elif self.time_displayer.get() == "                             0:00":
+            # Display message to user that recipe name is empty
+            messagebox.showerror("Error", "Recipe Duration cannot be empty.")
+        #  self.slider.set(0)
+        elif self.slider.get() == 0:
+            # Display message to user that recipe name is empty
+            messagebox.showerror("Error", "Steps cannot be zero.")
+
         else:
+            for textbox in self.step_entry_boxes:
+                if textbox.get() == "":
+                    # Display message to user that textbox is empty
+                    messagebox.showerror("Error", "Step cannot be empty.")
+                    return  # Stop execution if any textbox is empty
+
+            # Check for empty title text boxes
+            for title_textbox in self.step_title_boxes:
+                if title_textbox.get() == "":
+                    # Display message to user that title textbox is empty
+                    messagebox.showerror("Error", "Step Title  cannot be empty.")
+                    return  # Stop execution if any title textbox is empty
+
+            for timer in self.timers:
+                if timer.get() == "" or timer.get() == "          0:00":
+                    # Display message to user that title textbox is empty
+                    messagebox.showerror("Error", "Step Timer cannot be zero.")
+                    return
             # Save recipe and close window
             counter = self.counter_of_text_boxes
             x = self.winfo_x()
