@@ -2,13 +2,17 @@ from imports import *
 from Registration import Registration
 import tkinter as tk
 from tkinter import ttk
+from Lets_Cook import Lets_Cook
 
 
 class Recipe_search(customtkinter.CTk):
-
-    def __init__(self, prev_x, prev_y, intro_width, intro_height, number_of_text_boxes):
+    def __init__(self, parent_menu, photo_label, buttons_frame, exit_button):
         super().__init__()
-
+        self.exit_editing = None
+        self.parent = parent_menu
+        self.photoLabel = photo_label
+        self.buttons_frame = buttons_frame
+        self.exit_button = exit_button
         # Set window size to full screen
         self.new_index = None
         self.new_step_button = None
@@ -66,25 +70,19 @@ class Recipe_search(customtkinter.CTk):
         self.chinese_categories = None
         self.combobox = None
         self.stepp_counter = 0
-        self.geometry("{0}x{1}+{2}+{3}".format(intro_width, intro_height, prev_x, prev_y))
-        self.text_boxes = number_of_text_boxes
-        self.steps_visible = False
 
+        self.steps_visible = False
 
         self.filter_counter = 0
 
-        self.iconbitmap(r"C:\Users\Admin\Desktop\logo\image.ico")
-        self.title("Let's Cook-Recipe Search")
-
-        self.grid_columnconfigure((1, 2, 3, 4), weight=1)
-        self.grid_rowconfigure((0, 1, 2, 4), weight=1)
+        self.parent.title("Let's Cook-Recipe Search")
 
         # left frame
-        self.left_frame = customtkinter.CTkFrame(self, width=400, corner_radius=20)
+        self.left_frame = customtkinter.CTkFrame(self.parent, width=400, corner_radius=20)
         self.left_frame.grid(row=0, column=0, rowspan=5, columnspan=1, sticky="nsew", padx=(20, 1), pady=(20, 20))
         self.left_frame.grid_rowconfigure(4, weight=1)
 
-        self.center_frame = customtkinter.CTkFrame(self, width=850, corner_radius=20, height=80)
+        self.center_frame = customtkinter.CTkFrame(self.parent, width=850, corner_radius=20, height=80)
         self.center_frame.grid(row=0, column=1, columnspan=4, rowspan=5, sticky="nsew", padx=(3, 20), pady=(20, 20))
         self.center_frame.grid_rowconfigure(4, weight=1)
         self.center_frame.grid_columnconfigure(4, weight=1)
@@ -354,36 +352,39 @@ class Recipe_search(customtkinter.CTk):
         self.category_box.configure(values=categories)
 
     def back_to_menu(self):
-        x = self.winfo_x()
-        y = self.winfo_y()
-        recipe_search_width = self.winfo_width()
-        recipe_search_height = self.winfo_height()
-        counter = None
-        self.destroy()
-        from Menu import Menu
-        self.back = Menu(x, y, recipe_search_width, recipe_search_height, counter)
-        self.back.mainloop()
+        self.left_frame.destroy()
+        self.center_frame.destroy()
+        self.photoLabel.place(relx=0, rely=0, relwidth=1, relheight=1)
+        self.buttons_frame.grid()
+        self.exit_button.grid(row=5, column=2, padx=0, pady=0)
+        self.parent.title("Let's Cook-Menu")
 
     def editing(self):
         self.center_frame.grid_remove()
+        self.parent.title("Let's Cook-Editing")
         self.left_frame.grid_remove()
-        self.editing_frame = customtkinter.CTkFrame(self, width=850, corner_radius=20, height=80)
-        self.editing_frame.grid(row=0, column=1, columnspan=4, rowspan=5, sticky="nsew", padx=(20, 20), pady=(20, 20))
-        self.editing_frame.grid_rowconfigure(4, weight=1)
-        self.editing_frame.grid_columnconfigure(4, weight=1)
+        self.editing_frame = customtkinter.CTkFrame(self.parent, width=850, corner_radius=20, height=80)
+        self.editing_frame.grid(row=0, column=1, columnspan=7, rowspan=5, sticky="nsew", padx=(20, 20), pady=(20, 20))
+        self.editing_frame.grid_rowconfigure(4, weight=0)
+        self.editing_frame.grid_columnconfigure(4, weight=0)
 
         self.editing_title = customtkinter.CTkLabel(self.editing_frame, text="Editing Recipe",
                                                     font=('Century Gothic', 24))
-        self.editing_title.grid(row=1, column=1, columnspan=4, padx=(80, 1), pady=(10, 1), sticky="n")
+        self.editing_title.grid(row=0, column=1, columnspan=4, padx=(80, 1), pady=(10, 1), sticky="n")
 
         self.save_changes_button = customtkinter.CTkButton(self.editing_frame, text="Save Changes", width=70, height=35,
                                                            corner_radius=15,
                                                            command=self.save_changes)
         self.save_changes_button.grid(row=4, column=4, padx=0, pady=(50, 1), sticky="se")
 
-        self.scrollable_frame = customtkinter.CTkScrollableFrame(self.editing_frame, height=460,
+        self.exit_editing = customtkinter.CTkButton(self.editing_frame, text="       ←  back       ", width=100, height=35,
+                                                    corner_radius=15,
+                                                    command=self.exit)
+        self.exit_editing.grid(row=4, column=1, padx=(1, 1560), pady=(50, 1), sticky="se")
+
+        self.scrollable_frame = customtkinter.CTkScrollableFrame(self.editing_frame, height=840,
                                                                  scrollbar_button_hover_color="#3786D9",
-                                                                 width=670, corner_radius=12, border_width=5,
+                                                                 width=1730, corner_radius=12, border_width=5,
                                                                  border_color=("#3673F8", "orange",)
                                                                  )
         self.scrollable_frame.grid(row=0, column=1, padx=(50, 50), columnspan=4, rowspan=5,
@@ -392,7 +393,6 @@ class Recipe_search(customtkinter.CTk):
         self.scrollable_frame.grid_columnconfigure(1, weight=0)
         self.scrollable_frame.grid_columnconfigure(2, weight=0)
         self.scrollable_frame.grid_rowconfigure(3, weight=0)
-
 
         self.recipe_title = customtkinter.CTkLabel(self.scrollable_frame, text="Edit Recipe Name:",
                                                    font=('Century Gothic', 30))
@@ -448,7 +448,6 @@ class Recipe_search(customtkinter.CTk):
         self.steps_button.grid(column=0, row=10, padx=(1, 205), pady=(10, 1), sticky="se")
 
     def create_text_boxes(self):
-
 
         if self.steps_visible:
             # Hide the steps
@@ -551,26 +550,24 @@ class Recipe_search(customtkinter.CTk):
                 self.steps_visible = True
                 self.steps_created = True
 
-
     def add_new_step(self):
         new_index = self.stepp_counter  # determine index of new step
         self.stepp_counter += 1
-
 
         # create new widgets for step
         self.textbox = customtkinter.CTkEntry(self.scrollable_frame, width=670, font=('Arial', 12), height=150)
         self.textbox.grid(row=1 + 12 + new_index, column=0, pady=(150, 100), padx=(550, 1), sticky="w")
 
         self.title_textbox = customtkinter.CTkEntry(self.scrollable_frame, width=400, font=('Arial', 12), height=50,
-                                               corner_radius=18)
+                                                    corner_radius=18)
         self.title_textbox.grid(row=1 + 12 + new_index, column=0, pady=(100, 385), padx=(555, 1))
 
         self.step_message = customtkinter.CTkLabel(self.scrollable_frame, text=f"Please edit the {new_index + 1} step:",
-                                              font=('bold', 18))
+                                                   font=('bold', 18))
         self.step_message.grid(row=1 + 12 + new_index, column=0, padx=(350, 1), pady=(1, 130), sticky="w")
 
         self.subtract_button_third_step = customtkinter.CTkButton(self.scrollable_frame, text="-", width=100 - 6,
-                                                             height=32 - 6, command=lambda
+                                                                  height=32 - 6, command=lambda
                 index=new_index: self.subtract_button_callback(index))
         self.subtract_button_third_step.grid(row=1 + 12 + new_index, column=0, padx=(103, 1), pady=(350, 1))
 
@@ -578,16 +575,18 @@ class Recipe_search(customtkinter.CTk):
         self.entry_third_step.grid(row=1 + 12 + new_index, column=0, padx=(543, 1), pady=(350, 1))
         self.entry_third_step.insert(0, f"{' ':>50}0:00")
 
-        self.add_button_third_step = customtkinter.CTkButton(self.scrollable_frame, text="+", width=100 - 6, height=32 - 6,
-                                                        command=lambda index=new_index: self.add_button_callback(index))
+        self.add_button_third_step = customtkinter.CTkButton(self.scrollable_frame, text="+", width=100 - 6,
+                                                             height=32 - 6,
+                                                             command=lambda index=new_index: self.add_button_callback(
+                                                                 index))
         self.add_button_third_step.grid(row=1 + 12 + new_index, column=0, padx=(985, 1), pady=(350, 1))
 
         self.delete_step_img = Image.open(r"C:\Users\Admin\Desktop\logo\x.png")
         self.delete_step_img = self.delete_img.resize((24, 24))
         self.delete_step_photo = customtkinter.CTkImage(self.delete_step_img)
         self.delete_button = customtkinter.CTkButton(self.scrollable_frame, text="", width=100 - 6, height=32 - 6,
-                                                command=lambda index=new_index: self.delete_button_callback(index),
-                                                corner_radius=12, image=self.delete_step_photo)
+                                                     command=lambda index=new_index: self.delete_button_callback(index),
+                                                     corner_radius=12, image=self.delete_step_photo)
         self.delete_button.grid(row=1 + 12 + new_index, column=1, padx=(1, 1), pady=(40, 1), sticky="e")
         self.delete_buttons.append(self.delete_button)
 
@@ -643,8 +642,6 @@ class Recipe_search(customtkinter.CTk):
             button.configure(command=lambda index=i: self.add_button_callback(index))
         for i, button in enumerate(self.delete_buttons):
             button.configure(command=lambda index=i: self.delete_button_callback(index))
-
-
 
     def add_button_callback(self, index):
         if self.command is not None:
@@ -761,39 +758,30 @@ class Recipe_search(customtkinter.CTk):
                     messagebox.showerror("Error", "Step Timer cannot be zero.")
                     return
 
-            self.left_frame.grid()
-            self.center_frame.grid()  # Show the center frame
-            self.editing_frame.destroy()  # Hide the dok_frame
-            self.save_changes_button.destroy()  # Hide the dok_button
-            self.timers = []
-            self.subtract_button_timers = []
-            self.add_button_timers = []
-            self.tab3_text_boxes = []
-            self.step_message_array = []
-            self.title_textbox_array = []
-            self.delete_buttons = []
-            self.steps_created = False
-            self.steps_visible = False
-            self.text_box_visible = False
-            self.text_box_created = False
+            self.exit()
+
+    def exit(self):
+        self.left_frame.grid()
+        self.center_frame.grid()  # Show the center frame
+        self.editing_frame.destroy()  # Hide the dok_frame
+        self.save_changes_button.destroy()  # Hide the dok_button
+        self.timers = []
+        self.subtract_button_timers = []
+        self.add_button_timers = []
+        self.tab3_text_boxes = []
+        self.step_message_array = []
+        self.title_textbox_array = []
+        self.delete_buttons = []
+        self.steps_created = False
+        self.steps_visible = False
+        self.text_box_visible = False
+        self.text_box_created = False
+        self.parent.title("Let's Cook-Recipe Search")
 
 
     def lets_cook_window(self):
-        from Lets_Cook import Lets_Cook
+
         self.center_frame.grid_remove()
         self.left_frame.grid_remove()
-        Lets_Cook(self)
-
-
-
-
-
-
-if __name__ == "__main__":
-    x = 1
-    y = 1
-    recipe_search_width = 2000
-    recipe_search_height = 2000
-    counter = None
-    window = Recipe_search(x, y, recipe_search_width, recipe_search_height, counter)
-    window.mainloop()
+        self.parent.title("Let's Cook")
+        Lets_Cook(self.parent, self.center_frame, self.left_frame)

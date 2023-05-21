@@ -2,8 +2,16 @@ from imports import *
 
 
 class Registration(customtkinter.CTk):
-    def __init__(self, prev_x, prev_y, intro_width, intro_height):
+    def __init__(self, parent_menu, photo_label, buttons_frame, exit_button):
         super().__init__()
+        self.parent = parent_menu
+        self.parent = parent_menu
+        self.photoLabel = photo_label
+        self.buttons_frame = buttons_frame
+        self.exit_button = exit_button
+        self.extra_title = None
+        self.extra_title2 = None
+
         self.counter_of_text_boxes = None
         self.format_categoriess = None
         self.extra_title2 = None
@@ -20,11 +28,11 @@ class Registration(customtkinter.CTk):
         self.recipe_tittle = None
         self.current_timer_index = 0
         self.text_boxes_counter = 0
-        self.geometry("{0}x{1}+{2}+{3}".format(intro_width, intro_height, prev_x, prev_y))
+
 
         self.step_size = 3
         # Set window size to full screen
-        self.title("Registration")
+        self.parent.title("Let's Cook-Registration")
 
         # Set window position and size
 
@@ -35,22 +43,23 @@ class Registration(customtkinter.CTk):
         # self.photoLabel.config(image=self.register_photo)  # display the image
         # self.photoLabel.place(relx=0, rely=0, relwidth=1, relheight=1)
 
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(4, weight=1)
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_rowconfigure(6, weight=1)
 
         self.iconbitmap(r"C:\Users\Admin\Desktop\logo\image.ico")
         self.title("Let's Cook-Registration Recipe")
+        self.outside_frame = customtkinter.CTkFrame(self.parent, height=600)
+        self.outside_frame.grid(row=0, column=0, columnspan=7, rowspan=7, padx=(15, 15), pady=(15, 15),
+                             sticky="nsew")
+        self.outside_frame.grid_rowconfigure(4, weight=1)
+        self.outside_frame.grid_columnconfigure(4, weight=0)
 
-        self.main_frame = customtkinter.CTkFrame(self, height=600)
-        self.main_frame.grid(row=0, column=0, columnspan=7, rowspan=7, padx=(15, 15), pady=(15, 15),
+        self.main_frame = customtkinter.CTkFrame(self.outside_frame, width=2000, corner_radius=20, height=80)
+        self.main_frame.grid(row=0, column=1, columnspan=7, rowspan=7, padx=(15, 15), pady=(15, 15),
                              sticky="nsew")
         self.main_frame.grid_rowconfigure((0, 1, 2), weight=1)
         self.main_frame.grid_columnconfigure((0, 1, 2, 4, 5), weight=1)
 
-        self.tabview = customtkinter.CTkTabview(self.main_frame, border_width=5, corner_radius=30)
-        self.tabview.grid(row=0, column=1, rowspan=3, columnspan=4, padx=(1, 1), pady=(20, 0), sticky="nsew")
+        self.tabview = customtkinter.CTkTabview(self.main_frame, border_width=5, corner_radius=30, width=1550)
+        self.tabview.grid(row=0, column=1, rowspan=3, columnspan=4, padx=(10, 160), pady=(20, 20), sticky="nsew")
         self.tabview.add("step 1")
         self.tabview.add("step 2")
         self.tabview.add("step 3")
@@ -64,12 +73,12 @@ class Registration(customtkinter.CTk):
         # Buttons
 
         self.Save_Button = customtkinter.CTkButton(self.main_frame, text="Save Recipe", font=('Arial', 13, 'bold'),
-                                                   command=self.save_registration)
-        self.Save_Button.grid(row=3, column=6, sticky="nsew")
+                                                   command=self.save_registration, corner_radius=20)
+        self.Save_Button.grid(row=3, column=2,pady=(1, 15), padx=(1, 165), sticky="nsew")
 
-        self.Back_Button = customtkinter.CTkButton(self.main_frame, text="   ←  back     ", font=('Arial', 13, 'bold'),
-                                                   height=27, width=150, corner_radius=7, command=self.return_to_menu)
-        self.Back_Button.grid(row=0, column=0, sticky="nw")
+        self.Back_Button = customtkinter.CTkButton(self.main_frame, text="←  back ", font=('Arial', 13, 'bold'),
+                                                   height=27, width=130, corner_radius=7, command=self.return_to_menu)
+        self.Back_Button.grid(row=0, column=0, pady=(10, 1), padx=(10, 1), sticky="nw")
 
         self.cuisine_box = customtkinter.CTkOptionMenu(self.tabview.tab("step 1"), width=400, height=25, corner_radius=10,
                                                        dropdown_hover_color="#A4A4A4", dynamic_resizing=False,
@@ -82,7 +91,7 @@ class Registration(customtkinter.CTk):
                                                         f"{'Arabic':^70}",
                                                         f"{'Thai':^70}"])
 
-        self.cuisine_box.grid(row=1, column=0, padx=(380, 90), pady=(20, 60), sticky="s")
+        self.cuisine_box.grid(row=1, column=0, padx=(500, 90), pady=(20, 60), sticky="s")
         self.cuisine_box.set(f"{'Choose Cuisine':>40}")
 
         self.chinese_categories = ["BaoBan", "Noodles", "Sushi", "Ramen", "Soups", "Rice Dish", "Bowl",
@@ -124,7 +133,7 @@ class Registration(customtkinter.CTk):
                                                             f"{'Pasta':^82}",
                                                             f"{'Dessert':^82}"])
         self.category_box.set(f"{'Choose Category':>48}")
-        self.category_box.grid(row=3, column=0, padx=(315, 1), pady=(10, 1), sticky="s")
+        self.category_box.grid(row=3, column=0, padx=(420, 1), pady=(10, 1), sticky="s")
 
         # Bind the <<ComboboxSelected>> event to the display_categories method
 
@@ -133,11 +142,11 @@ class Registration(customtkinter.CTk):
                                                           dropdown_hover_color="#A4A4A4", dynamic_resizing=False,
                                                           dropdown_font=('bold', 18), font=('Arial', 18, 'bold'),
                                                           values=[
-                                                              f"{'Easy':^83}",
-                                                              f"{'Medium':^85}",
-                                                              f"{'Difficult':^88}",
+                                                              f"{'Easy':^85}",
+                                                              f"{'Medium':^82}",
+                                                              f"{'Difficult':^86}",
                                                           ], )
-        self.difficulty_box.grid(row=4, column=0, padx=(315, 1), pady=(10, 1), sticky="s")
+        self.difficulty_box.grid(row=4, column=0, padx=(420, 1), pady=(10, 1), sticky="s")
         self.difficulty_box.set(f"{'Choose Level':>47}")
 
         self.Recipe_name = customtkinter.CTkEntry(self.tabview.tab("step 1"),
@@ -147,29 +156,29 @@ class Registration(customtkinter.CTk):
                                                                    "Enter Recipe Name", width=500,
                                                   height=25,
                                                   border_width=1, corner_radius=10)
-        self.Recipe_name.grid(row=2, column=0, padx=(315, 1), pady=10, sticky="s")
+        self.Recipe_name.grid(row=2, column=0, padx=(420, 1), pady=10, sticky="s")
 
         self.subtract_button = customtkinter.CTkButton(self.tabview.tab("step 1"), text="-", width=100 - 6,
                                                        height=32 - 6,
                                                        command=self.step1_subtract)
-        self.subtract_button.grid(row=7, column=0, padx=(174, 200), pady=3)
+        self.subtract_button.grid(row=7, column=0, padx=(274, 200), pady=3)
 
         self.time_displayer = customtkinter.CTkEntry(self.tabview.tab("step 1"), width=250, height=26,
                                                      border_width=0)
-        self.time_displayer.grid(row=7, column=0, padx=(570, 1), pady=1, sticky="w")
+        self.time_displayer.grid(row=7, column=0, padx=(620, 1), pady=1, sticky="w")
 
         self.add_button = customtkinter.CTkButton(self.tabview.tab("step 1"), text="+", width=100 - 6, height=32 - 6,
                                                   command=self.step1_add)
-        self.add_button.grid(row=7, column=0, padx=(580, 1), pady=3)
+        self.add_button.grid(row=7, column=0, padx=(740, 1), pady=3)
         # default value
-        self.time_displayer.insert(0, "                             0:00")
+        self.time_displayer.insert(0, "                                  0:00")
 
         # Titles
         self.tittle = customtkinter.CTkLabel(self.main_frame, text="Registration Recipe", font=('Century Gothic', 20))
-        self.tittle.grid(row=0, column=1, columnspan=4, padx=(1, 1), pady=1, sticky="n")
-        self.combobox_tittle = customtkinter.CTkLabel(self.tabview.tab("step 1"), text="Choose Cuisine:",
+        self.tittle.grid(row=0, column=1, columnspan=4, padx=(1, 150), pady=1, sticky="n")
+        self.combobox_tittle = customtkinter.CTkLabel(self.tabview.tab("step 1"), text="Cuisine:",
                                                       font=('Century Gothic', 24))
-        self.combobox_tittle.grid(row=0, column=0, padx=(590, 290), pady=0, sticky="nsew")
+        self.combobox_tittle.grid(row=0, column=0, padx=(705, 290), pady=0, sticky="nsew")
 
         self.recipe_tittle = customtkinter.CTkLabel(self.tabview.tab("step 1"), text="Recipe Name:",
                                                     font=('Century Gothic', 22))
@@ -191,16 +200,16 @@ class Registration(customtkinter.CTk):
         self.second_step = customtkinter.CTkLabel(self.tabview.tab("step 2"),
                                                   text="Enter the ingredients of the recipe:",
                                                   font=('Century Gothic', 24))
-        self.second_step.grid(row=0, column=0, columnspan=4, padx=(1, 400), pady=(50, 1), sticky="n")
+        self.second_step.grid(row=0, column=0, columnspan=4, padx=(1, 400), pady=(25, 1), sticky="n")
 
         # Step 2
         # Ctk text box
 
-        self.textbox = customtkinter.CTkTextbox(self.tabview.tab("step 2"), width=700, corner_radius=12,
-                                                height=500, border_width=5, border_spacing=25,
+        self.textbox = customtkinter.CTkTextbox(self.tabview.tab("step 2"), width=1000, corner_radius=12,
+                                                height=600, border_width=5, border_spacing=25,
                                                 border_color=("#3673F8", "orange"),
                                                 scrollbar_button_color=("#3673F8", "orange"), font=('Arial', 24))
-        self.textbox.grid(row=1, column=1, padx=(370, 1), pady=(60, 1), sticky="nsew")
+        self.textbox.grid(row=1, column=1, padx=(250, 1), pady=(60, 1), sticky="nsew")
         self.textbox.insert("0.0", "A recipe has no soul.\nYou, as the cook, must bring soul to the recipe!")
 
         # Bind the <FocusIn> event to the text box
@@ -212,16 +221,16 @@ class Registration(customtkinter.CTk):
         self.third_step = customtkinter.CTkLabel(self.tabview.tab("step 3"),
                                                  text="Enter the recipe steps:",
                                                  font=('Century Gothic', 24))
-        self.third_step.grid(row=0, column=0, columnspan=4, padx=(1, 400), pady=(50, 1), sticky="n")
+        self.third_step.grid(row=0, column=0, columnspan=4, padx=(1, 550), pady=(25, 1), sticky="n")
 
         # Inside Tab Frame
 
-        self.tab_frame = customtkinter.CTkScrollableFrame(self.tabview.tab("step 3"), height=460,
+        self.tab_frame = customtkinter.CTkScrollableFrame(self.tabview.tab("step 3"), height=565,
                                                           scrollbar_button_hover_color="#3786D9",
-                                                          width=670, corner_radius=12, border_width=5,
+                                                          width=970, corner_radius=12, border_width=5,
                                                           border_color=("#3673F8", "orange",)
                                                           )
-        self.tab_frame.grid(row=1, column=1, padx=(370, 1), pady=(60, 1), sticky="nsew")
+        self.tab_frame.grid(row=1, column=1, padx=(250, 1), pady=(60, 1), sticky="nsew")
         self.tab_frame.grid_columnconfigure(0, weight=1)
         self.tab_frame.grid_rowconfigure(3, weight=1)
 
@@ -230,13 +239,13 @@ class Registration(customtkinter.CTk):
         self.third_step = customtkinter.CTkLabel(self.tab_frame,
                                                  text="Use slider for number of steps:",
                                                  font=('Century Gothic', 24))
-        self.third_step.grid(row=0, column=0, columnspan=4, padx=(1, 1), pady=(50, 50), sticky="nsew")
+        self.third_step.grid(row=0, column=0, columnspan=4, padx=(25, 1), pady=(150, 50), sticky="nsew")
 
         # Slider
         self.slider = customtkinter.CTkSlider(self.tab_frame, from_=0, to=30, progress_color="orange", width=400,
-                                              height=15, border_width=1)
+                                              height=18, border_width=1)
 
-        self.slider.grid(row=2, column=0, padx=(135, 1), pady=1, sticky="nw")
+        self.slider.grid(row=2, column=0, padx=(300, 1), pady=1, sticky="nw")
         self.slider.bind("<ButtonRelease-1>",
                          self.update_count)  # bind the slider to a function to update the count label
         self.slider.set(0)
@@ -250,21 +259,23 @@ class Registration(customtkinter.CTk):
         self.slider_button = customtkinter.CTkButton(self.tab_frame, text="Apply Steps",
                                                      width=150, border_width=0, corner_radius=8,
                                                      font=('Arial', 13, 'bold'), command=self.create_text_boxes)
-        self.slider_button.grid(row=5, column=0, padx=(260, 1), pady=(1, 50), sticky="w")
+        self.slider_button.grid(row=5, column=0, padx=(415, 1), pady=(1, 50), sticky="w")
 
     def create_text_boxes(self):
 
         # We use the value of slider
+        slider_value = int(self.slider_count.cget('text'))
 
-        # Extra Title Enter Steps
-        self.extra_title = customtkinter.CTkLabel(self.tab_frame,
-                                                  text="Enter the steps below:",
-                                                  font=('Century Gothic', 24))
-        self.extra_title.grid(row=6, column=0, columnspan=4, padx=(17, 1), pady=(1, 1), sticky="nsew")
-        self.extra_title2 = customtkinter.CTkLabel(self.tab_frame,
-                                                   text="Use timers for the duration of each step:",
-                                                   font=('Century Gothic', 12))
-        self.extra_title2.grid(row=7, column=0, columnspan=4, padx=(1, 1), pady=(1, 1), sticky="nsew")
+        # Check if the slider count is 0
+        if slider_value == 0:
+            # If count is 0, hide the extra titles
+            self.hide_extra_titles()
+        else:
+            # If count is non-zero, show the extra titles
+            self.show_extra_titles()
+
+
+
 
         widgets_to_remove = self.step_entry_boxes + self.subtract_button_timers + self.timers + self.add_button_timers + self.step_message_array + self.step_title_boxes
         text_boxes_counter = 0
@@ -325,6 +336,27 @@ class Registration(customtkinter.CTk):
             self.step_message_array.append(step_message)
             self.step_title_boxes.append(title_textbox)
             self.counter_of_text_boxes = text_boxes_counter
+
+    def show_extra_titles(self):
+        if self.extra_title is None:
+            # Create the extra title labels
+            self.extra_title = customtkinter.CTkLabel(self.tab_frame,
+                                                      text="Enter the steps below:",
+                                                      font=('Century Gothic', 24))
+            self.extra_title.grid(row=6, column=0, columnspan=4, padx=(17, 1), pady=(1, 1), sticky="nsew")
+            self.extra_title2 = customtkinter.CTkLabel(self.tab_frame,
+                                                       text="Use timers for the duration of each step:",
+                                                       font=('Century Gothic', 12))
+            self.extra_title2.grid(row=7, column=0, columnspan=4, padx=(1, 1), pady=(1, 1), sticky="nsew")
+
+    def hide_extra_titles(self):
+        if self.extra_title is not None:
+            # Hide the extra title labels
+            self.extra_title.grid_forget()
+            self.extra_title2.grid_forget()
+            self.extra_title = None
+            self.extra_title2 = None
+
 
     def add_button_callback(self, index):
         if self.command is not None:
@@ -421,15 +453,13 @@ class Registration(customtkinter.CTk):
         self.category_box.configure(values=categories)
 
     def return_to_menu(self):
-        x = self.winfo_x()
-        y = self.winfo_y()
-        registration_width = self.winfo_width()
-        counter = None
-        registration_height = self.winfo_height()
-        self.destroy()
-        from Menu import Menu
-        self.back = Menu(x, y, registration_width, registration_height, counter)
-        self.back.mainloop()
+        self.main_frame.destroy()
+        self.outside_frame.destroy()
+        self.photoLabel.place(relx=0, rely=0, relwidth=1, relheight=1)
+        self.buttons_frame.grid()
+        self.exit_button.grid(row=5, column=2, padx=0, pady=0)
+        self.parent.title("Let's Cook-Menu")
+
 
     def save_registration(self):
         if self.Recipe_name.get() == "":
@@ -479,15 +509,7 @@ class Registration(customtkinter.CTk):
                     # Display message to user that title textbox is empty
                     messagebox.showerror("Error", "Step Timer cannot be zero.")
                     return
-            # Save recipe and close window
-            counter = self.counter_of_text_boxes
-            x = self.winfo_x()
-            y = self.winfo_y()
-            registration_width = self.winfo_width()
-            registration_height = self.winfo_height()
-            self.destroy()
-            from Menu import Menu
-            self.back = Menu(x, y, registration_width, registration_height, counter)
-            self.back.mainloop()
+            self.return_to_menu()
+
 
 

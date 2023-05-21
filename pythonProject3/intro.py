@@ -1,23 +1,29 @@
 from imports import *
 from Menu import Menu
-
-
+from screeninfo import get_monitors
 
 from imports import *
 from Menu import Menu
+
 
 class Intro(customtkinter.CTk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.menu = None
-        self.title("Let's Cook")
+        self.title("Let's Cook-Intro")
 
         # Set window size
-        self.overrideredirect(False)  # to allow for the window decorations
-        width = int(self.winfo_screenwidth() * 1.039)
-        height = int(self.winfo_screenheight() * 0.941)
-        x = int(self.winfo_screenwidth() / 2 - width / 2 + 25)
-        y = int(self.winfo_screenheight() / 2 - height / 2 - 40)
+        # Get the primary monitor's resolution
+
+        primary_monitor = get_monitors()[0]
+        width = int(primary_monitor.width)
+        height = int(primary_monitor.height + 10)
+
+        # Calculate the window position
+        x = int((primary_monitor.width - width) / 2 - 11)
+        y = int((primary_monitor.height - height) / 2 - 5)
+
+        # Set the window geometry
         self.geometry("{0}x{1}+{2}+{3}".format(width, height, x, y))
 
         self.resizable(True, True)
@@ -45,21 +51,10 @@ class Intro(customtkinter.CTk):
                                                         command=self.on_close)
         self.LetS_Cook_Button.grid(row=1, column=1, padx=0, pady=0)
 
-        self.protocol('WM_DELETE_WINDOW', self.on_close)
-
     def on_close(self):
-        # Get the size and position of the Intro window
-        intro_width = self.winfo_width()
-        intro_height = self.winfo_height()
-        intro_x = self.winfo_x()
-        intro_y = self.winfo_y()
-        counter = None
-
-        if self.menu is None:
-            self.destroy()  # Destroy the Intro window
-            self.menu = Menu(intro_x, intro_y, intro_width, intro_height, counter
-                             )  # Pass size and position to Menu
-            self.menu.mainloop()
-
-
-
+        self.photoLabel.destroy()
+        self.LetS_Cook_Button.grid_remove()
+        # Hide the Intro window
+        # Create the Menu window
+        self.title("Let's Cook-Menu")
+        self.menu = Menu(self)
