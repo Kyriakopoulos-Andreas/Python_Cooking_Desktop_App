@@ -2,13 +2,17 @@ import tkinter
 
 from imports import *
 import sqlite3
+
 conn = sqlite3.connect("Recipes.db")
-#conn.execute("drop table Recipe")
-#conn.execute("drop table Step")
+# conn.execute("drop table Recipe")
+# conn.execute("drop table Step")
 cursor = conn.cursor()
-cursor.execute("CREATE TABLE IF NOT EXISTS Recipe(recipeId INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT,cuisine TEXT, category TEXT, difficulty TEXT, duration INTEGER,ingredients TEXT) ")
-cursor.execute("CREATE TABLE IF NOT EXISTS Step(stepId INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, instructions TEXT, time INTEGER,recipeId INTEGER, FOREIGN KEY (recipeId) REFERENCES Recipe(recipeId)) ")
+cursor.execute(
+    "CREATE TABLE IF NOT EXISTS Recipe(recipeId INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT,cuisine TEXT, category TEXT, difficulty TEXT, duration INTEGER,ingredients TEXT) ")
+cursor.execute(
+    "CREATE TABLE IF NOT EXISTS Step(stepId INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, instructions TEXT, time INTEGER,recipeId INTEGER, FOREIGN KEY (recipeId) REFERENCES Recipe(recipeId)) ")
 conn.commit()
+
 
 class Registration(customtkinter.CTk):
     def __init__(self, parent_menu, photo_label, buttons_frame, exit_button):
@@ -38,7 +42,6 @@ class Registration(customtkinter.CTk):
         self.current_timer_index = 0
         self.text_boxes_counter = 0
 
-
         self.step_size = 3
         # Set window size to full screen
         self.parent.title("Let's Cook-Registration")
@@ -52,12 +55,11 @@ class Registration(customtkinter.CTk):
         # self.photoLabel.config(image=self.register_photo)  # display the image
         # self.photoLabel.place(relx=0, rely=0, relwidth=1, relheight=1)
 
-
         self.iconbitmap(r"C:/Users/Admin/PycharmProjects/pythonProject3/logo/image.ico")
         self.title("Let's Cook-Registration Recipe")
         self.outside_frame = customtkinter.CTkFrame(self.parent, height=600)
         self.outside_frame.grid(row=0, column=0, columnspan=7, rowspan=7, padx=(15, 15), pady=(15, 15),
-                             sticky="nsew")
+                                sticky="nsew")
         self.outside_frame.grid_rowconfigure(4, weight=1)
         self.outside_frame.grid_columnconfigure(4, weight=0)
 
@@ -83,22 +85,23 @@ class Registration(customtkinter.CTk):
 
         self.Save_Button = customtkinter.CTkButton(self.main_frame, text="Save Recipe", font=('Arial', 13, 'bold'),
                                                    command=self.save_registration, corner_radius=20)
-        self.Save_Button.grid(row=3, column=2,pady=(1, 15), padx=(1, 165), sticky="nsew")
+        self.Save_Button.grid(row=3, column=2, pady=(1, 15), padx=(1, 165), sticky="nsew")
 
         self.Back_Button = customtkinter.CTkButton(self.main_frame, text="←  back ", font=('Arial', 13, 'bold'),
                                                    height=27, width=130, corner_radius=7, command=self.return_to_menu)
         self.Back_Button.grid(row=0, column=0, pady=(10, 1), padx=(10, 1), sticky="nw")
 
-        self.cuisine_box = customtkinter.CTkOptionMenu(self.tabview.tab("step 1"), width=400, height=25, corner_radius=10,
+        self.cuisine_box = customtkinter.CTkOptionMenu(self.tabview.tab("step 1"), width=400, height=25,
+                                                       corner_radius=10,
                                                        dropdown_hover_color="#A4A4A4", dynamic_resizing=False,
                                                        dropdown_font=('bold', 18), font=('Arial', 18, 'bold'),
                                                        command=self.display_categories,
                                                        values=[
-                                                        f"{'Mediterranean':^65}",
-                                                        f"{'Chinese':^70}",
-                                                        f"{'Mexican':^70}",
-                                                        f"{'Arabic':^70}",
-                                                        f"{'Thai':^70}"])
+                                                           f"{'Mediterranean':^65}",
+                                                           f"{'Chinese':^70}",
+                                                           f"{'Mexican':^70}",
+                                                           f"{'Arabic':^70}",
+                                                           f"{'Thai':^70}"])
 
         self.cuisine_box.grid(row=1, column=0, padx=(500, 90), pady=(20, 60), sticky="s")
         self.cuisine_box.set(f"{'Choose Cuisine':>40}")
@@ -283,9 +286,6 @@ class Registration(customtkinter.CTk):
             # If count is non-zero, show the extra titles
             self.show_extra_titles()
 
-
-
-
         widgets_to_remove = self.step_entry_boxes + self.subtract_button_timers + self.timers + self.add_button_timers + self.step_message_array + self.step_title_boxes
         text_boxes_counter = 0
         # Remove old textboxes
@@ -366,7 +366,6 @@ class Registration(customtkinter.CTk):
             self.extra_title = None
             self.extra_title2 = None
 
-
     def add_button_callback(self, index):
         if self.command is not None:
             self.command()
@@ -380,24 +379,23 @@ class Registration(customtkinter.CTk):
         self.current_timer_index = index
 
     def change_spinbox_value(self, entry_third_step, increment):
-        if entry_third_step.winfo_exists():
-            try:
-                current_value = entry_third_step.get()
-                hours, minutes = map(int, current_value.split(':'))
-                current_time = timedelta(hours=hours, minutes=minutes)
-                new_time = current_time + timedelta(minutes=increment)
+        try:
+            current_value = entry_third_step.get()
+            hours, minutes = map(int, current_value.split(':'))
+            current_time = timedelta(hours=hours, minutes=minutes)
+            new_time = current_time + timedelta(minutes=increment)
 
-                # Ensure that the time will be equal or higher of 00:00
-                if new_time < timedelta():
-                    new_time = timedelta()
+            # Ensure that the time will be equal or higher of 00:00
+            if new_time < timedelta():
+                new_time = timedelta()
 
-                hours, minutes = divmod(new_time.seconds // 60, 60)
-                formatted_time = f"{hours:11}:{minutes:02}"
+            hours, minutes = divmod(new_time.seconds // 60, 60)
+            formatted_time = f"{hours:11}:{minutes:02}"
 
-                entry_third_step.delete(0, "end")
-                entry_third_step.insert(0, formatted_time)
-            except ValueError:
-                pass
+            entry_third_step.delete(0, "end")
+            entry_third_step.insert(0, formatted_time)
+        except ValueError:
+            pass
 
     def step1_time_changer(self, increment):
         try:
@@ -436,9 +434,7 @@ class Registration(customtkinter.CTk):
     def clear_text(self, event):
         if self.textbox.get("1.0",
                             "end-1c") == "A recipe has no soul.\nYou, as the cook, must bring soul to the recipe!":
-            self.second_step.place_forget()
             self.textbox.delete("1.0", "end")
-            self.textbox.unbind("<FocusIn>", None)
 
     def display_categories(self, event):
         selected_cuisine = self.cuisine_box.get().strip()
@@ -469,7 +465,6 @@ class Registration(customtkinter.CTk):
         self.exit_button.grid(row=5, column=2, padx=0, pady=0)
         self.parent.title("Let's Cook-Menu")
 
-
     def save_registration(self):
         if self.Recipe_name.get() == "":
             # Display message to user that recipe name is empty
@@ -478,7 +473,7 @@ class Registration(customtkinter.CTk):
                 or self.textbox.get('1.0', 'end-1c') == "A recipe has no soul.\nYou," \
                                                         " as the cook, must bring soul to the recipe!":
             # Display message to user that textbox is empty
-            messagebox.showerror("Error", "Textbox cannot be empty.")
+            messagebox.showerror("Error", "Ingredients cannot be empty.")
             # Special string arguments used to represent the starting and ending positions of a text widget's content.
         elif self.cuisine_box.get() == f"{'Choose Cuisine':>40}":
             # Display message to user that recipe name is empty
@@ -500,34 +495,35 @@ class Registration(customtkinter.CTk):
             messagebox.showerror("Error", "Steps cannot be zero.")
 
         else:
-           # for textbox in self.step_entry_boxes:
-           #     if textbox.get() == "":
+            for textbox in self.step_entry_boxes:
+                if textbox.get() == "":
                     # Display message to user that textbox is empty
-           #         messagebox.showerror("Error", "Step cannot be empty.")
-           #         return  # Stop execution if any textbox is empty
+                    messagebox.showerror("Error", "Step cannot be empty.")
+                    return  # Stop execution if any textbox is empty
 
             # Check for empty title text boxes
-            #for title_textbox in self.step_title_boxes:
-            #    if title_textbox.get() == "":
+            for title_textbox in self.step_title_boxes:
+                if title_textbox.get() == "":
                     # Display message to user that title textbox is empty
-            #        messagebox.showerror("Error", "Step Title  cannot be empty.")
-            #        return  # Stop execution if any title textbox is empty
+                    messagebox.showerror("Error", "Step Title  cannot be empty.")
+                    return  # Stop execution if any title textbox is empty
 
-            #for timer in self.timers:
-            #    if timer.get() == "" or timer.get() == "          0:00":
+            for timer in self.timers:
+                if timer.get() == "" or timer.get() == "          0:00":
                     # Display message to user that title textbox is empty
-            #        messagebox.showerror("Error", "Step Timer cannot be zero.")
-            #        return
+                    messagebox.showerror("Error", "Step Timer cannot be zero.")
+                    return
 
-            cursor.execute("INSERT INTO Recipe (name,cuisine, category , difficulty , duration ,ingredients) VALUES(?, ?, ?, ?, ?, ?)",(self.Recipe_name.get(), self.cuisine_box.get().strip(),self.category_box.get().strip(),self.difficulty_box.get().strip(), str(self.time_displayer.get().strip()), self.textbox.get("1.0",tkinter.END)))
-            recipeId  = cursor.lastrowid
+            cursor.execute(
+                "INSERT INTO Recipe (name,cuisine, category , difficulty , duration ,ingredients) VALUES(?, ?, ?, ?, ?, ?)",
+                (self.Recipe_name.get(), self.cuisine_box.get().strip(), self.category_box.get().strip(),
+                 self.difficulty_box.get().strip(), str(self.time_displayer.get().strip()),
+                 self.textbox.get("1.0", tkinter.END)))
+            recipeId = cursor.lastrowid
             for counter in range(self.counter_of_text_boxes):
-                cursor.execute("INSERT INTO STEP(title, instructions, time, recipeId) VALUES(?, ?, ?, ?)", (self.step_title_boxes[counter].get(), self.step_entry_boxes[counter].get(), str(self.timers[counter].get().strip()), recipeId))
+                cursor.execute("INSERT INTO STEP(title, instructions, time, recipeId) VALUES(?, ?, ?, ?)", (
+                    self.step_title_boxes[counter].get(), self.step_entry_boxes[counter].get(),
+                    str(self.timers[counter].get().strip()), recipeId))
 
             conn.commit()
             self.return_to_menu()
-
-
-
-
-

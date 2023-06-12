@@ -553,7 +553,7 @@ class Recipe_search(customtkinter.CTk):
                                                                border_width=0)
 
                 self.entry_third_step.grid(row=12 + i, column=0, padx=(543, 1), pady=(350, 1))
-                self.entry_third_step.insert(0, f"{' ':>50}0:00")
+
 
                 self.add_button_third_step = customtkinter.CTkButton(self.scrollable_frame, text="+", width=100 - 6,
                                                                      height=32 - 6,

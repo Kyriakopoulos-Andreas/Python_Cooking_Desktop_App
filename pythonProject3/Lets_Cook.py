@@ -120,11 +120,7 @@ class Lets_Cook(customtkinter.CTk):
         self.start_button.grid_remove()
         self.stepCounter = 1
         self.numberOfStep = 0
-        self.content_label.configure(text="")
-        self.content_label.configure(text="Number of steps: " + str(1) + "\n" +
-                                          "Title: " + str(self.steps[self.numberOfStep][1]) + "\n" +
-                                          "Instructions: " + str(self.steps[self.numberOfStep][2]) + "\n" +
-                                          "Duration: " + str(self.steps[self.numberOfStep][3]))
+
 
         self.step_duration_label = customtkinter.CTkLabel(
             self.information_frame,
@@ -134,7 +130,7 @@ class Lets_Cook(customtkinter.CTk):
             justify="left",
             width=60
         )
-        self.step_duration_label.grid(row=2, column=1, padx=(200, 1), pady=10, sticky="w")
+        self.step_duration_label.grid(row=3, column=1, padx=(200, 1), pady=10, sticky="w")
 
         self.recipe_name_label.configure(text=f"Number of steps:  {1}")
         self.ingredients_label.configure(text=f"Title: {self.steps[self.numberOfStep][1]}")
@@ -159,25 +155,27 @@ class Lets_Cook(customtkinter.CTk):
             self.numberOfStep = self.numberOfSteps[0] - 1
             return False
 
-        self.content_label.configure(text="")
-        self.content_label.configure(text="Number of steps: " + str(self.stepCounter) + "\n" +
-                                          "Title: " + str(self.steps[self.numberOfStep][1]) + "\n" +
-                                          "Instructions: " + str(self.steps[self.numberOfStep][2]) + "\n" +
-                                          "Duration: " + str(self.steps[self.numberOfStep][3]))
+
+        self.recipe_name_label.configure(text=f"Number of steps:  {self.stepCounter}")
+        self.ingredients_label.configure(text=f"Title: {self.steps[self.numberOfStep][1]}")
+        self.duration_label.configure(text=f"Instructions:   {self.steps[self.numberOfStep][2]}")
+        self.step_duration_label.configure(text=f"Step Duration: {textwrap.fill(self.steps[self.numberOfStep][3], self.character_limit)}",)
 
     def showLastStep(self):
-        self.content_label.configure(text="")
-        self.content_label.configure(text="Number of steps: " + str(self.numberOfSteps[0]) + "\n" +
-                                          "Title: " + str(self.steps[self.numberOfSteps[0] - 1][1]) + "\n" +
-                                          "Instructions: " + str(self.steps[self.numberOfSteps[0] - 1][2]) + "\n" +
-                                          "Duration: " + str(self.steps[self.numberOfSteps[0] - 1][3]))
+
+
+        self.recipe_name_label.configure(text=f"Number of steps:  {self.numberOfSteps[0]}")
+        self.ingredients_label.configure(text=f"Title: {self.steps[self.numberOfSteps[0] - 1][1]}")
+        self.duration_label.configure(text=f"Instructions:   {self.steps[self.numberOfSteps[0] - 1][2]}")
+        self.step_duration_label.configure(text=f"Step Duration: {textwrap.fill(self.steps[self.numberOfSteps[0] - 1][3], self.character_limit)}",)
 
     def showFirstStep(self):
-        self.content_label.configure(text="")
-        self.content_label.configure(text="Number of steps: " + str(1) + "\n" +
-                                          "Title: " + str(self.steps[0][1]) + "\n" +
-                                          "Instructions: " + str(self.steps[0][2]) + "\n" +
-                                          "Duration: " + str(self.steps[0][3]))
+
+
+        self.recipe_name_label.configure(text=f"Number of steps:  {1}")
+        self.ingredients_label.configure(text=f"Title: {self.steps[self.numberOfStep][1]}")
+        self.duration_label.configure(text=f"Instructions:   {self.steps[self.numberOfStep][2]}")
+        self.step_duration_label.configure(text=f"Step Duration: {textwrap.fill(self.steps[self.numberOfStep][3], self.character_limit)}",)
 
     def previousStep(self):
         self.stepCounter -= 1
@@ -187,11 +185,11 @@ class Lets_Cook(customtkinter.CTk):
             self.stepCounter = 1
             self.numberOfStep = 0
             return False
-        self.content_label.configure(text="")
-        self.content_label.configure(text="Number of step: " + str(self.stepCounter) + "\n" +
-                                          "Title: " + str(self.steps[self.numberOfStep][1]) + "\n" +
-                                          "Instructions: " + str(self.steps[self.numberOfStep][2]) + "\n" +
-                                          "Duration: " + str(self.steps[self.numberOfStep][3]))
+
+        self.recipe_name_label.configure(text=f"Number of steps:  {self.stepCounter}")
+        self.ingredients_label.configure(text=f"Title: {self.steps[self.numberOfStep][1]}")
+        self.duration_label.configure(text=f"Instructions:   {self.steps[self.numberOfStep][2]}")
+        self.step_duration_label.configure(text=f"Step Duration: {textwrap.fill(self.steps[self.numberOfStep][3], self.character_limit)}",)
 
     def back(self):
 

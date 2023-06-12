@@ -1,6 +1,4 @@
-from imports import *
-from Menu import Menu
-from screeninfo import get_monitors
+
 
 from imports import *
 from Menu import Menu
@@ -26,7 +24,7 @@ class Intro(customtkinter.CTk):
         # Set the window geometry
         self.geometry("{0}x{1}+{2}+{3}".format(width, height, x, y))
 
-        self.resizable(True, True)
+
         self.iconbitmap(r"C:\Users\Admin\Desktop\logo\image.ico")
         self.image = Image.open(r"C:\Users\Admin\Desktop\logo\cook.jpg")
         self.photoImage = ImageTk.PhotoImage(self.image)

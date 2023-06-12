@@ -36,7 +36,7 @@ class Menu(customtkinter.CTk):
 
 
 
-        self.resizable(True, True)
+
         self.iconbitmap(r"C:\Users\Admin\Desktop\logo\image.ico")
 
         self.image = Image.open(r"C:\Users\Admin\Desktop\logo\cook.jpg")
