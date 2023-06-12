@@ -1,13 +1,23 @@
+import sqlite3
+import tkinter
+
 from imports import *
 from Registration import Registration
 import tkinter as tk
 from tkinter import ttk
 from Lets_Cook import Lets_Cook
 
+conn = sqlite3.connect("Recipes.db")
+cursor = conn.cursor()
+
 
 class Recipe_search(customtkinter.CTk):
     def __init__(self, parent_menu, photo_label, buttons_frame, exit_button):
         super().__init__()
+        self.counter_db = 0
+        self.Recipe_name = None
+        self.recipe = None
+        self.values = None
         self.exit_editing = None
         self.parent = parent_menu
         self.photoLabel = photo_label
@@ -70,6 +80,7 @@ class Recipe_search(customtkinter.CTk):
         self.chinese_categories = None
         self.combobox = None
         self.stepp_counter = 0
+        self.filtersOn = False
 
         self.steps_visible = False
 
@@ -105,13 +116,13 @@ class Recipe_search(customtkinter.CTk):
                                                            font=customtkinter.CTkFont(size=30, weight="bold"))
         self.recipe_search_tittle.grid(row=0, column=0, padx=(80, 80), pady=(20, 300), sticky="n")
 
-        self.Recipe_name = customtkinter.CTkEntry(self.left_inside_frame,
+        self.search_name = customtkinter.CTkEntry(self.left_inside_frame,
                                                   placeholder_text="                     "
                                                                    "                     "
                                                                    "Enter Recipe Name", width=400,
                                                   height=25,
                                                   border_width=1, corner_radius=10)
-        self.Recipe_name.grid(row=0, column=0, padx=(20, 20), pady=(100, 150), sticky="n")
+        self.search_name.grid(row=0, column=0, padx=(20, 20), pady=(100, 150), sticky="n")
 
         self.recipe_search_tittle = customtkinter.CTkLabel(self.left_inside_frame, text="Use filters to find a recipe",
                                                            font=customtkinter.CTkFont(size=20, weight="bold"))
@@ -125,7 +136,7 @@ class Recipe_search(customtkinter.CTk):
                                                    width=60, height=30, corner_radius=15, command=self.back_to_menu)
         self.back_button.grid(row=90, column=0, padx=0, pady=(50, 1), sticky="w")
 
-        self.edit_img = Image.open(r"C:\Users\Admin\Desktop\logo\spoon.png")
+        self.edit_img = Image.open(r"C:\Users\Admin\PycharmProjects\pythonProject3\logo\spoon.png")
         self.edit_img = self.edit_img.resize((24, 24))
         self.edit_photo = customtkinter.CTkImage(self.edit_img)
 
@@ -134,16 +145,16 @@ class Recipe_search(customtkinter.CTk):
                                                       )
         self.editing_button.grid(row=0, column=0, padx=(1, 10), pady=(30, 30), sticky="e")
 
-        self.delete_img = Image.open(r"C:\Users\Admin\Desktop\logo\x.png")
+        self.delete_img = Image.open(r"C:\Users\Admin\PycharmProjects\pythonProject3\logo\x.png")
         self.delete_img = self.delete_img.resize((24, 24))
         self.delete_photo = customtkinter.CTkImage(self.delete_img)
 
         self.delete_button = customtkinter.CTkButton(self.bottom_frame, text="Delete Recipe", image=self.delete_photo,
-                                                     width=130, height=40, corner_radius=15,
+                                                     width=130, height=40, corner_radius=15, command=self.delete
                                                      )
         self.delete_button.grid(row=0, column=4, padx=(1, 10), pady=(30, 30), sticky="w")
 
-        self.img = Image.open(r"C:\Users\Admin\Desktop\logo\chef.png")
+        self.img = Image.open(r"C:\Users\Admin\PycharmProjects\pythonProject3\logo\chef.png")
         self.img = self.img.resize((24, 24))
         self.photo = customtkinter.CTkImage(self.img)
 
@@ -152,12 +163,12 @@ class Recipe_search(customtkinter.CTk):
                                                    command=self.lets_cook_window)
         self.cook_button.grid(row=0, column=2, padx=(1, 1), pady=(30, 30), sticky="nsew")
 
-        self.search_img = Image.open(r"C:\Users\Admin\Desktop\logo\search.png")
+        self.search_img = Image.open(r"C:\Users\Admin\PycharmProjects\pythonProject3\logo\search.png")
         self.search_img = self.search_img.resize((24, 24))
         self.search_photo = customtkinter.CTkImage(self.search_img)
 
         self.search_button = customtkinter.CTkButton(self.left_inside_frame, text="Search", image=self.search_photo,
-                                                     width=240, height=40)
+                                                     width=240, height=40, command=self.search_but)
         self.search_button.grid(row=3, column=0, padx=0, pady=(10, 1), )
 
         self.information_frame = customtkinter.CTkFrame(self.inside_frame, height=360,
@@ -190,10 +201,15 @@ class Recipe_search(customtkinter.CTk):
         self.tree_view.heading('level', text='Level')
 
         # Insert items and values into tree view
-        self.tree_view.insert("", "end", text="Item 1", values=("01", "Carbonara", "Italian", "Pasta's", "Easy"))
+        cursor.execute("SELECT * FROM Recipe")
+        recipes = cursor.fetchall()
+
+        for recipe in recipes:
+            print(recipe[6])
+            self.tree_view.insert("", "end", text="Item 1",
+                                  values=(recipe[0], recipe[1], recipe[2], recipe[3], recipe[4]))
         self.appearance_mode = ctk.get_appearance_mode()
         # Define colors based on appearance mode
-
         self.style = ttk.Style(self.tree_view)
 
         if self.appearance_mode == "Dark":
@@ -326,8 +342,10 @@ class Recipe_search(customtkinter.CTk):
             self.combobox.destroy()
             self.category_box.destroy()
             self.difficulty_box.destroy()
+            self.filtersOn = False
 
         else:
+            self.filtersOn = True
             self.display_filters()
 
     def display_categories(self, event):
@@ -360,6 +378,9 @@ class Recipe_search(customtkinter.CTk):
         self.parent.title("Let's Cook-Menu")
 
     def editing(self):
+        selectedRow = self.tree_view.focus()
+        if not selectedRow:
+            return
         self.center_frame.grid_remove()
         self.parent.title("Let's Cook-Editing")
         self.left_frame.grid_remove()
@@ -377,7 +398,8 @@ class Recipe_search(customtkinter.CTk):
                                                            command=self.save_changes)
         self.save_changes_button.grid(row=4, column=4, padx=0, pady=(50, 1), sticky="se")
 
-        self.exit_editing = customtkinter.CTkButton(self.editing_frame, text="       ←  back       ", width=100, height=35,
+        self.exit_editing = customtkinter.CTkButton(self.editing_frame, text="       ←  back       ", width=100,
+                                                    height=35,
                                                     corner_radius=15,
                                                     command=self.exit)
         self.exit_editing.grid(row=4, column=1, padx=(1, 1560), pady=(50, 1), sticky="se")
@@ -398,7 +420,7 @@ class Recipe_search(customtkinter.CTk):
                                                    font=('Century Gothic', 30))
         self.recipe_title.grid(row=2, column=0, padx=(350, 1), pady=60, sticky="nw")
 
-        self.Recipe_name = customtkinter.CTkEntry(self.scrollable_frame,
+        self.search_name = customtkinter.CTkEntry(self.scrollable_frame,
                                                   placeholder_text="                  "
                                                                    "                          "
                                                                    "                          "
@@ -406,7 +428,7 @@ class Recipe_search(customtkinter.CTk):
                                                                    "Enter Recipe Name", width=700,
                                                   height=30,
                                                   border_width=1, corner_radius=10)
-        self.Recipe_name.grid(row=2, column=0, padx=(550, 1), pady=(150, 1), sticky="s")
+        self.search_name.grid(row=2, column=0, padx=(550, 1), pady=(150, 1), sticky="s")
 
         self.time_duration = customtkinter.CTkLabel(self.scrollable_frame, text="Edit Recipe Duration:",
                                                     font=('Century Gothic', 30))
@@ -424,8 +446,6 @@ class Recipe_search(customtkinter.CTk):
         self.add_button = customtkinter.CTkButton(self.scrollable_frame, text="+", width=100 - 6, height=32 - 6,
                                                   command=self.step1_add)
         self.add_button.grid(row=7, column=0, padx=(1058, 1), pady=8)
-        # default value
-        self.entry.insert(0, f"{' ':>68}0:00")
 
         self.ingredients_title = customtkinter.CTkLabel(self.scrollable_frame, text="Edit Recipe Ingredients:",
                                                         font=('Century Gothic', 30))
@@ -446,6 +466,14 @@ class Recipe_search(customtkinter.CTk):
                                                     corner_radius=15,
                                                     command=self.create_text_boxes)
         self.steps_button.grid(column=0, row=10, padx=(1, 205), pady=(10, 1), sticky="se")
+
+        items = self.tree_view.item(selectedRow)
+        self.values = items.get("values")
+        sql_query = "SELECT * FROM Recipe WHERE recipeId =?"
+        cursor.execute(sql_query, (self.values[0],))
+        self.recipe = cursor.fetchall()
+        self.search_name.insert(0, self.values[1])
+        self.entry.insert(0, f"{' ':>68}" + str(self.recipe[0][5]))
 
     def create_text_boxes(self):
 
@@ -497,7 +525,10 @@ class Recipe_search(customtkinter.CTk):
             self.steps_visible = True
             # Create new textboxes
         if not self.steps_created:
-            for i, _ in enumerate(range(5)):
+            sql_query = "SELECT COUNT(stepId)FROM Step WHERE recipeId=?;"
+            cursor.execute(sql_query, (self.values[0],))
+            numberOfSteps = cursor.fetchall()
+            for i, _ in enumerate(range(int(numberOfSteps[0][0]))):
                 self.stepp_counter += 1
                 self.textbox = customtkinter.CTkEntry(self.scrollable_frame, width=670, font=('Arial', 12), height=150)
                 self.textbox.grid(row=12 + i, column=0, pady=(150, 100), padx=(550, 1), sticky="w")
@@ -549,6 +580,17 @@ class Recipe_search(customtkinter.CTk):
                 self.title_textbox_array.append(self.title_textbox)
                 self.steps_visible = True
                 self.steps_created = True
+
+            selectedRecipe = self.recipe[0]
+            sql_query = "SELECT * FROM Step WHERE recipeId =?"
+            cursor.execute(sql_query, (selectedRecipe[0],))
+            selectedSteps = cursor.fetchall()
+            text_boxes_counter = 0
+            for step in selectedSteps:
+                self.title_textbox_array[text_boxes_counter].insert(tkinter.INSERT, step[1])
+                self.tab3_text_boxes[text_boxes_counter].insert(tkinter.INSERT, step[2])
+                self.timers[text_boxes_counter].insert(0, f"{' ':>50}" + str(step[3]))
+                text_boxes_counter += 1
 
     def add_new_step(self):
         new_index = self.stepp_counter  # determine index of new step
@@ -689,6 +731,9 @@ class Recipe_search(customtkinter.CTk):
                 self.text_box_created = True
             self.ingredients_textbox.grid(row=9, column=0, padx=(525, 1), pady=(1, 1), sticky="nsew")
             self.text_box_visible = True
+        selectedRecipe = self.recipe[0]
+        if len(self.ingredients_textbox.get("1.0", "end-1c")) == 0:
+            self.ingredients_textbox.insert(tkinter.INSERT, selectedRecipe[6])
 
     def step1_time_changer(self, increment):
         try:
@@ -721,7 +766,7 @@ class Recipe_search(customtkinter.CTk):
 
     def save_changes(self):
 
-        if self.Recipe_name.get() == "":
+        if self.search_name.get() == "":
             # Display message to user that recipe name is empty
             messagebox.showerror("Error", "Recipe name cannot be empty.")
         elif self.entry.get() == f"{' ':>68}0:00":
@@ -757,14 +802,35 @@ class Recipe_search(customtkinter.CTk):
                     # Display message to user that title textbox is empty
                     messagebox.showerror("Error", "Step Timer cannot be zero.")
                     return
-
+            if self.ingredients_textbox is None:
+                cursor.execute(
+                    "UPDATE Recipe SET name=?,duration=? WHERE recipeId=?",
+                    (self.search_name.get(), self.entry.get().strip(), self.values[0]))
+                cursor.execute("DELETE FROM STEP WHERE recipeId = ?", (self.values[0],))
+                for counter in range(self.stepp_counter):
+                    cursor.execute("INSERT INTO STEP(title, instructions, time, recipeId) VALUES(?, ?, ?, ?)", (
+                        self.title_textbox_array[counter].get(), self.tab3_text_boxes[counter].get(),
+                        self.timers[counter].get().strip(), self.values[0]))
+            else:
+                cursor.execute(
+                    "UPDATE Recipe SET name=?,duration=?,ingredients=? WHERE recipeId=?",
+                    (self.search_name.get(), self.entry.get().strip(), self.ingredients_textbox.get("1.0", tkinter.END),
+                     self.values[0]))
+                cursor.execute("DELETE FROM STEP WHERE recipeId = ?", (self.values[0],))
+                for counter in range(self.stepp_counter):
+                    cursor.execute("INSERT INTO STEP(title, instructions, time, recipeId) VALUES(?, ?, ?, ?)", (
+                        self.title_textbox_array[counter].get(), self.tab3_text_boxes[counter].get(),
+                        self.timers[counter].get().strip(), self.values[0]))
+            conn.commit()
             self.exit()
 
     def exit(self):
         self.left_frame.grid()
-        self.center_frame.grid()  # Show the center frame
-        self.editing_frame.destroy()  # Hide the dok_frame
-        self.save_changes_button.destroy()  # Hide the dok_button
+        self.center_frame.grid()
+        self.editing_frame.destroy()
+        self.save_changes_button.destroy()
+
+        # Initialize lists here
         self.timers = []
         self.subtract_button_timers = []
         self.add_button_timers = []
@@ -776,12 +842,92 @@ class Recipe_search(customtkinter.CTk):
         self.steps_visible = False
         self.text_box_visible = False
         self.text_box_created = False
+        self.ingredients_textbox = None
         self.parent.title("Let's Cook-Recipe Search")
 
+    def delete(self):
+        selectedRowToDelete = self.tree_view.focus()
+        if not selectedRowToDelete:
+            return
+        items = self.tree_view.item(selectedRowToDelete)
+        self.rowValues = items.get("values")
+        sql_query = "DELETE FROM Recipe WHERE recipeId =?"
+        cursor.execute(sql_query, (self.rowValues[0],))
+        sql_query = "DELETE FROM Step WHERE recipeId =?"
+        cursor.execute(sql_query, (self.rowValues[0],))
+        conn.commit()
+        cursor.execute("SELECT * FROM Recipe")
+        recipes = cursor.fetchall()
+        for row in self.tree_view.get_children():
+            self.tree_view.delete(row)
+        for recipe in recipes:
+            print(recipe[6])
+            self.tree_view.insert("", "end", text="Item 1",
+                                  values=(recipe[0], recipe[1], recipe[2], recipe[3], recipe[4]))
+
+    def search_but(self):
+        if self.filtersOn:
+            if self.search_name.index("end") == 0:
+                query = "SELECT * FROM Recipe WHERE cuisine=? AND category=? AND difficulty=?"
+                cuisine = self.combobox.get().strip()
+                category = self.category_box.get().strip()
+                diff = self.difficulty_box.get().strip()
+                cursor.execute(query, (cuisine, category, diff))
+                search_recipes = cursor.fetchall()
+                for row in self.tree_view.get_children():
+                    self.tree_view.delete(row)
+                for recipe in search_recipes:
+                    self.tree_view.insert("", "end", text="Item 1",
+                                          values=(recipe[0], recipe[1], recipe[2], recipe[3], recipe[4]))
+                return False
+            else:
+                query = "SELECT * FROM Recipe WHERE name=? AND cuisine=? AND category=? AND difficulty=?"
+                cursor.execute(query, (
+                self.search_name.get(), self.combobox.get(), self.category_box.get(), self.difficulty_box.get()))
+                search_recipes = cursor.fetchall()
+                for row in self.tree_view.get_children():
+                    self.tree_view.delete(row)
+                for recipe in search_recipes:
+                    self.tree_view.insert("", "end", text="Item 1",
+                                          values=(recipe[0], recipe[1], recipe[2], recipe[3], recipe[4]))
+                return False
+        else:
+            if self.search_name.index("end") == 0:
+                cursor.execute("SELECT * FROM Recipe")
+                recipes = cursor.fetchall()
+                for row in self.tree_view.get_children():
+                    self.tree_view.delete(row)
+                for recipe in recipes:
+                    print(recipe[6])
+                    self.tree_view.insert("", "end", text="Item 1",
+                                          values=(recipe[0], recipe[1], recipe[2], recipe[3], recipe[4]))
+                return False
+            else:
+                sql_query = "SELECT * FROM Recipe WHERE NAME=?"
+                cursor.execute(sql_query, (self.search_name.get(),))
+                search_recipes = cursor.fetchall()
+                for row in self.tree_view.get_children():
+                    self.tree_view.delete(row)
+                for recipe in search_recipes:
+                    self.tree_view.insert("", "end", text="Item 1",
+                                          values=(recipe[0], recipe[1], recipe[2], recipe[3], recipe[4]))
+
+    def show_all_recipes(self):
+        if self.search_name.get().compare("end-1c", "==", "1.0"):
+            cursor.execute("SELECT * FROM Recipe")
+            recipes = cursor.fetchall()
+            for recipe in recipes:
+                print(recipe[6])
+                self.tree_view.insert("", "end", text="Item 1",
+                                      values=(recipe[0], recipe[1], recipe[2], recipe[3], recipe[4]))
 
     def lets_cook_window(self):
-
+        selectedRow = self.tree_view.focus()
+        if not selectedRow:
+            return
+        items = self.tree_view.item(selectedRow)
+        selectedValues = items.get("values")
         self.center_frame.grid_remove()
         self.left_frame.grid_remove()
         self.parent.title("Let's Cook")
-        Lets_Cook(self.parent, self.center_frame, self.left_frame)
+        Lets_Cook(self.parent, self.center_frame, self.left_frame, selectedValues[0])

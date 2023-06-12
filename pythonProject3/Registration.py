@@ -1,5 +1,14 @@
-from imports import *
+import tkinter
 
+from imports import *
+import sqlite3
+conn = sqlite3.connect("Recipes.db")
+#conn.execute("drop table Recipe")
+#conn.execute("drop table Step")
+cursor = conn.cursor()
+cursor.execute("CREATE TABLE IF NOT EXISTS Recipe(recipeId INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT,cuisine TEXT, category TEXT, difficulty TEXT, duration INTEGER,ingredients TEXT) ")
+cursor.execute("CREATE TABLE IF NOT EXISTS Step(stepId INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, instructions TEXT, time INTEGER,recipeId INTEGER, FOREIGN KEY (recipeId) REFERENCES Recipe(recipeId)) ")
+conn.commit()
 
 class Registration(customtkinter.CTk):
     def __init__(self, parent_menu, photo_label, buttons_frame, exit_button):
@@ -44,7 +53,7 @@ class Registration(customtkinter.CTk):
         # self.photoLabel.place(relx=0, rely=0, relwidth=1, relheight=1)
 
 
-        self.iconbitmap(r"C:\Users\Admin\Desktop\logo\image.ico")
+        self.iconbitmap(r"C:/Users/Admin/PycharmProjects/pythonProject3/logo/image.ico")
         self.title("Let's Cook-Registration Recipe")
         self.outside_frame = customtkinter.CTkFrame(self.parent, height=600)
         self.outside_frame.grid(row=0, column=0, columnspan=7, rowspan=7, padx=(15, 15), pady=(15, 15),
@@ -208,7 +217,7 @@ class Registration(customtkinter.CTk):
         self.textbox = customtkinter.CTkTextbox(self.tabview.tab("step 2"), width=1000, corner_radius=12,
                                                 height=600, border_width=5, border_spacing=25,
                                                 border_color=("#3673F8", "orange"),
-                                                scrollbar_button_color=("#3673F8", "orange"), font=('Arial', 24))
+                                                scrollbar_button_color=("#3673F8", "orange"), font=('Arial', 35))
         self.textbox.grid(row=1, column=1, padx=(250, 1), pady=(60, 1), sticky="nsew")
         self.textbox.insert("0.0", "A recipe has no soul.\nYou, as the cook, must bring soul to the recipe!")
 
@@ -402,7 +411,7 @@ class Registration(customtkinter.CTk):
                 new_time = timedelta()
 
             hours, minutes = divmod(new_time.seconds // 60, 60)
-            formatted_time = f"{hours:30}:{minutes:02}"
+            formatted_time = f"{hours:35}:{minutes:02}"
 
             self.time_displayer.delete(0, "end")
             self.time_displayer.insert(0, formatted_time)
@@ -491,25 +500,34 @@ class Registration(customtkinter.CTk):
             messagebox.showerror("Error", "Steps cannot be zero.")
 
         else:
-            for textbox in self.step_entry_boxes:
-                if textbox.get() == "":
+           # for textbox in self.step_entry_boxes:
+           #     if textbox.get() == "":
                     # Display message to user that textbox is empty
-                    messagebox.showerror("Error", "Step cannot be empty.")
-                    return  # Stop execution if any textbox is empty
+           #         messagebox.showerror("Error", "Step cannot be empty.")
+           #         return  # Stop execution if any textbox is empty
 
             # Check for empty title text boxes
-            for title_textbox in self.step_title_boxes:
-                if title_textbox.get() == "":
+            #for title_textbox in self.step_title_boxes:
+            #    if title_textbox.get() == "":
                     # Display message to user that title textbox is empty
-                    messagebox.showerror("Error", "Step Title  cannot be empty.")
-                    return  # Stop execution if any title textbox is empty
+            #        messagebox.showerror("Error", "Step Title  cannot be empty.")
+            #        return  # Stop execution if any title textbox is empty
 
-            for timer in self.timers:
-                if timer.get() == "" or timer.get() == "          0:00":
+            #for timer in self.timers:
+            #    if timer.get() == "" or timer.get() == "          0:00":
                     # Display message to user that title textbox is empty
-                    messagebox.showerror("Error", "Step Timer cannot be zero.")
-                    return
+            #        messagebox.showerror("Error", "Step Timer cannot be zero.")
+            #        return
+
+            cursor.execute("INSERT INTO Recipe (name,cuisine, category , difficulty , duration ,ingredients) VALUES(?, ?, ?, ?, ?, ?)",(self.Recipe_name.get(), self.cuisine_box.get().strip(),self.category_box.get().strip(),self.difficulty_box.get().strip(), str(self.time_displayer.get().strip()), self.textbox.get("1.0",tkinter.END)))
+            recipeId  = cursor.lastrowid
+            for counter in range(self.counter_of_text_boxes):
+                cursor.execute("INSERT INTO STEP(title, instructions, time, recipeId) VALUES(?, ?, ?, ?)", (self.step_title_boxes[counter].get(), self.step_entry_boxes[counter].get(), str(self.timers[counter].get().strip()), recipeId))
+
+            conn.commit()
             self.return_to_menu()
+
+
 
 
 

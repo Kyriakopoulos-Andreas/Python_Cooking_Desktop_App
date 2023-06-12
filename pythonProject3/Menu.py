@@ -54,6 +54,14 @@ class Menu(customtkinter.CTk):
         self.buttons_frame = customtkinter.CTkFrame(self.parent, width=200, corner_radius=0)
         self.buttons_frame.grid(row=0, column=0, rowspan=6, sticky="nsew")
         self.buttons_frame.grid_rowconfigure(4, weight=1)
+
+        # logo frame
+        self.img = Image.open(r"C:\Users\Admin\PycharmProjects\pythonProject3\logo\lets_cook1.png")
+        self.resized_img = self.img.resize((100, 100), Image.ANTIALIAS)
+        self.photo = ImageTk.PhotoImage(self.resized_img)
+
+        self.image_label = customtkinter.CTkLabel(self.buttons_frame, image=self.photo, text=" ")
+        self.image_label.grid(row=1, column=0, padx=20, pady=(1, 22))
         # logo frame
         self.logo_label = customtkinter.CTkLabel(self.buttons_frame, text="Let's   Cook",
                                                  font=customtkinter.CTkFont(size=30, weight="bold"))
