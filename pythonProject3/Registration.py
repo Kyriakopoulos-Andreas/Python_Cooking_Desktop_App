@@ -1,7 +1,6 @@
-import tkinter
-
 from imports import *
 import sqlite3
+import tkinter
 
 conn = sqlite3.connect("Recipes.db")
 # conn.execute("drop table Recipe")
@@ -17,16 +16,18 @@ conn.commit()
 class Registration(customtkinter.CTk):
     def __init__(self, parent_menu, photo_label, buttons_frame, exit_button):
         super().__init__()
-        self.parent = parent_menu
-        self.parent = parent_menu
+        self.parent = parent_menu  # Δημιουργία μεταβλητή parent για αναφορά στον γονέα
+        # Ορίζουμε τις νέες μεταβλητές που θα χρησιμοποιήσουμε για να αναφερθούμε στα αντικείμενα του Μενού
         self.photoLabel = photo_label
         self.buttons_frame = buttons_frame
         self.exit_button = exit_button
+
+        # Αρχικοποιήσεις
         self.extra_title = None
         self.extra_title2 = None
 
         self.counter_of_text_boxes = None
-        self.format_categoriess = None
+        self.format_categories = None
         self.extra_title2 = None
         self.entry_third_step = None
         self.extra_title = None
@@ -42,38 +43,31 @@ class Registration(customtkinter.CTk):
         self.current_timer_index = 0
         self.text_boxes_counter = 0
 
-        self.step_size = 3
-        # Set window size to full screen
-        self.parent.title("Let's Cook-Registration")
+        self.step_size = 3  # Μεταβλητή για την αύξηση του χρόνου της διάρκειας της συνταγής και των βημάτων της
 
-        # Set window position and size
+        self.parent.title("Let's Cook-Registration")  # Αλλαγή της επικεφαλίδας της εφαρμογής
 
-        # self.reg_image = Image.open(r"C:\Users\Admin\Desktop\logo\reg_small_image.jpg")
-        # self.register_photo = ImageTk.PhotoImage(self.reg_image)
-        # self.photoLabel = tk.Label(self.pop_up)
-        # self.photoLabel.image = self.register_photo  # keep reference to avoid garbage collection
-        # self.photoLabel.config(image=self.register_photo)  # display the image
-        # self.photoLabel.place(relx=0, rely=0, relwidth=1, relheight=1)
-
-        self.iconbitmap(r"C:/Users/Admin/PycharmProjects/pythonProject3/logo/image.ico")
-        self.title("Let's Cook-Registration Recipe")
+        # Δημιουργία του εξωτερικού frame που μπαίνει πάνω στο parent
         self.outside_frame = customtkinter.CTkFrame(self.parent, height=600)
         self.outside_frame.grid(row=0, column=0, columnspan=7, rowspan=7, padx=(15, 15), pady=(15, 15),
                                 sticky="nsew")
-        self.outside_frame.grid_rowconfigure(4, weight=1)
+        self.outside_frame.grid_rowconfigure(4, weight=1)  # Ορίζουμε το διάγραμμα του Frame σε γραμμές στήλες
         self.outside_frame.grid_columnconfigure(4, weight=0)
 
+        # Δημιουργία main frame πάνω στο outside frame
         self.main_frame = customtkinter.CTkFrame(self.outside_frame, width=2000, corner_radius=20, height=80)
         self.main_frame.grid(row=0, column=1, columnspan=7, rowspan=7, padx=(15, 15), pady=(15, 15),
                              sticky="nsew")
-        self.main_frame.grid_rowconfigure((0, 1, 2), weight=1)
+        self.main_frame.grid_rowconfigure((0, 1, 2), weight=1)  # Ορίζουμε το διάγραμμα του Frame σε γραμμές στήλες
         self.main_frame.grid_columnconfigure((0, 1, 2, 4, 5), weight=1)
 
+        # Δημιουργία Frame σε στιλ κουρτίνας, και ορισμός ονομάτων του κάθε παραθύρου
         self.tabview = customtkinter.CTkTabview(self.main_frame, border_width=5, corner_radius=30, width=1550)
         self.tabview.grid(row=0, column=1, rowspan=3, columnspan=4, padx=(10, 160), pady=(20, 20), sticky="nsew")
         self.tabview.add("step 1")
         self.tabview.add("step 2")
         self.tabview.add("step 3")
+        # Δημιουργία διαγράμματος για το κάθε step με γραμμές και στήλες
         for tab_name in ["step 1", "step 2", "step 3"]:
             tab_frame = self.tabview.tab(tab_name)
             tab_frame.grid_columnconfigure(0, weight=0)
@@ -81,16 +75,15 @@ class Registration(customtkinter.CTk):
             tab_frame.grid_rowconfigure(0, weight=0)
             tab_frame.grid_rowconfigure(1, weight=0)
 
-        # Buttons
-
+        # Κουμπί για αποθήκευση συνταγής
         self.Save_Button = customtkinter.CTkButton(self.main_frame, text="Save Recipe", font=('Arial', 13, 'bold'),
                                                    command=self.save_registration, corner_radius=20)
         self.Save_Button.grid(row=3, column=2, pady=(1, 15), padx=(1, 165), sticky="nsew")
-
+        # Κουμπί για επιστροφή στο Μενού
         self.Back_Button = customtkinter.CTkButton(self.main_frame, text="←  back ", font=('Arial', 13, 'bold'),
                                                    height=27, width=130, corner_radius=7, command=self.return_to_menu)
         self.Back_Button.grid(row=0, column=0, pady=(10, 1), padx=(10, 1), sticky="nw")
-
+        # Δημιουργία widget για επιλογή Κουζίνας
         self.cuisine_box = customtkinter.CTkOptionMenu(self.tabview.tab("step 1"), width=400, height=25,
                                                        corner_radius=10,
                                                        dropdown_hover_color="#A4A4A4", dynamic_resizing=False,
@@ -104,8 +97,9 @@ class Registration(customtkinter.CTk):
                                                            f"{'Thai':^70}"])
 
         self.cuisine_box.grid(row=1, column=0, padx=(500, 90), pady=(20, 60), sticky="s")
-        self.cuisine_box.set(f"{'Choose Cuisine':>40}")
+        self.cuisine_box.set(f"{'Choose Cuisine':>40}")  # Αρχικοποιούμε το option menu να δείχνει σε choose cuisine
 
+        # Δημιουργία λιστών για τις κατηγορίες πιάτων της κάθε κουζίνας
         self.chinese_categories = ["BaoBan", "Noodles", "Sushi", "Ramen", "Soups", "Rice Dish", "Bowl",
                                    "Street Food"]
         self.mexican_categories = ["Tacos", "Burritos", "Enchiladas", "Fajitas", "Quesadilla", "Nachos"]
@@ -116,7 +110,7 @@ class Registration(customtkinter.CTk):
         self.arabic_categories = ["Shakshuka", "Lahmacun", "Falafel", "Hummus", "Kebab", "Salad", "Dessert"
                                   ]
 
-        self.format_categories = [
+        self.format_categories = [  # Περνάμε τις λίστες μέσα σε μια άλλη λίστα για ευκολότερη διαχείριση
             self.chinese_categories,
             self.mexican_categories,
             self.italian_categories,
@@ -124,13 +118,12 @@ class Registration(customtkinter.CTk):
             self.thai_categories,
             self.arabic_categories
         ]
-
-        # Loop through each category list
+        # Διατρέχουμε ένα βρόγχο για πιο όμορφη μορφοποίηση με τα σωστά κενά έτσι ώστε φαίνονται στη μέση του OptionMenu
         for category in self.format_categories:
             for i in range(len(category)):
-                # Apply the formatting to each element in the category list
                 category[i] = f"{category[i]:^82}"
 
+        # Δημιουργία Option Menu widget για την επιλογή κατηγορίας πιάτου
         self.category_box = customtkinter.CTkOptionMenu(self.tabview.tab("step 1"),
                                                         width=500, height=25, corner_radius=10,
                                                         dropdown_hover_color="#A4A4A4", dynamic_resizing=False,
@@ -144,11 +137,10 @@ class Registration(customtkinter.CTk):
                                                             f"{'Pie':^82}",
                                                             f"{'Pasta':^82}",
                                                             f"{'Dessert':^82}"])
-        self.category_box.set(f"{'Choose Category':>48}")
+        self.category_box.set(f"{'Choose Category':>48}")  # Αρχικοποίηση με Choose Category
         self.category_box.grid(row=3, column=0, padx=(420, 1), pady=(10, 1), sticky="s")
 
-        # Bind the <<ComboboxSelected>> event to the display_categories method
-
+        # Δημιουργία Option Menu widget για την επιλογή δυσκολίας της συνταγής
         self.difficulty_box = customtkinter.CTkOptionMenu(self.tabview.tab("step 1"),
                                                           width=500, height=25, corner_radius=10,
                                                           dropdown_hover_color="#A4A4A4", dynamic_resizing=False,
@@ -159,8 +151,9 @@ class Registration(customtkinter.CTk):
                                                               f"{'Difficult':^86}",
                                                           ], )
         self.difficulty_box.grid(row=4, column=0, padx=(420, 1), pady=(10, 1), sticky="s")
-        self.difficulty_box.set(f"{'Choose Level':>47}")
+        self.difficulty_box.set(f"{'Choose Level':>47}")  # Αρχικοποίηση με Choose Category
 
+        # Δημιουργία Widget καταχώρισης για την εισαγωγή του ονόματος της συνταγής
         self.Recipe_name = customtkinter.CTkEntry(self.tabview.tab("step 1"),
                                                   placeholder_text="                    "
                                                                    "                     "
@@ -170,6 +163,9 @@ class Registration(customtkinter.CTk):
                                                   border_width=1, corner_radius=10)
         self.Recipe_name.grid(row=2, column=0, padx=(420, 1), pady=10, sticky="s")
 
+        # Δημιουργία WIDGET τύπου Μετρητή χρόνου
+
+        # Δημιουργία κουμπιών προσθαφαίρεσης χρόνου και σημείου προβολής του χρόνου
         self.subtract_button = customtkinter.CTkButton(self.tabview.tab("step 1"), text="-", width=100 - 6,
                                                        height=32 - 6,
                                                        command=self.step1_subtract)
@@ -182,10 +178,10 @@ class Registration(customtkinter.CTk):
         self.add_button = customtkinter.CTkButton(self.tabview.tab("step 1"), text="+", width=100 - 6, height=32 - 6,
                                                   command=self.step1_add)
         self.add_button.grid(row=7, column=0, padx=(740, 1), pady=3)
-        # default value
-        self.time_displayer.insert(0, "                                  0:00")
 
-        # Titles
+        self.time_displayer.insert(0, "                                  0:00")  # Αρχικοποίηση μετρητή στο 0
+
+        # Τίτλοι και επικεφαλίδες STEP 1
         self.tittle = customtkinter.CTkLabel(self.main_frame, text="Registration Recipe", font=('Century Gothic', 20))
         self.tittle.grid(row=0, column=1, columnspan=4, padx=(1, 150), pady=1, sticky="n")
         self.combobox_tittle = customtkinter.CTkLabel(self.tabview.tab("step 1"), text="Cuisine:",
@@ -208,15 +204,13 @@ class Registration(customtkinter.CTk):
                                                     font=('Century Gothic', 22))
         self.time_duration.grid(row=5, column=0, padx=(220, 1), pady=(50, 40), sticky="nw")
 
-        # Second Step Tittles
+        # Τίτλος STEP 2 για τα υλικά της συνταγής
         self.second_step = customtkinter.CTkLabel(self.tabview.tab("step 2"),
                                                   text="Enter the ingredients of the recipe:",
                                                   font=('Century Gothic', 24))
         self.second_step.grid(row=0, column=0, columnspan=4, padx=(1, 400), pady=(25, 1), sticky="n")
 
-        # Step 2
-        # Ctk text box
-
+        # Δημιουργία Κουτιού καταχώρισης για εισαγωγή υλικών από τον χρήστη
         self.textbox = customtkinter.CTkTextbox(self.tabview.tab("step 2"), width=1000, corner_radius=12,
                                                 height=600, border_width=5, border_spacing=25,
                                                 border_color=("#3673F8", "orange"),
@@ -224,19 +218,17 @@ class Registration(customtkinter.CTk):
         self.textbox.grid(row=1, column=1, padx=(250, 1), pady=(60, 1), sticky="nsew")
         self.textbox.insert("0.0", "A recipe has no soul.\nYou, as the cook, must bring soul to the recipe!")
 
-        # Bind the <FocusIn> event to the text box
+        # Όταν ο χρήστης κάνει focus(Κάνει κλικ μέσα στο text box) το event πραγματοποιείτε και καλεί την συνάρτηση
+        # Clear text η οποία σβήνει το περιεχόμενο του Text box
         self.textbox.bind("<FocusIn>", self.clear_text)
 
-        # step 3
-
-        # Tittle
+        # Τίτλος τρίτου βήματος
         self.third_step = customtkinter.CTkLabel(self.tabview.tab("step 3"),
                                                  text="Enter the recipe steps:",
                                                  font=('Century Gothic', 24))
         self.third_step.grid(row=0, column=0, columnspan=4, padx=(1, 550), pady=(25, 1), sticky="n")
 
-        # Inside Tab Frame
-
+        # Δημιουργία scrollable frame με slider
         self.tab_frame = customtkinter.CTkScrollableFrame(self.tabview.tab("step 3"), height=565,
                                                           scrollbar_button_hover_color="#3786D9",
                                                           width=970, corner_radius=12, border_width=5,
@@ -246,28 +238,31 @@ class Registration(customtkinter.CTk):
         self.tab_frame.grid_columnconfigure(0, weight=1)
         self.tab_frame.grid_rowconfigure(3, weight=1)
 
-        # Inside Bar Tittles
-
+        # Τίτλος του scrollable frame
         self.third_step = customtkinter.CTkLabel(self.tab_frame,
                                                  text="Use slider for number of steps:",
                                                  font=('Century Gothic', 24))
         self.third_step.grid(row=0, column=0, columnspan=4, padx=(25, 1), pady=(150, 50), sticky="nsew")
 
-        # Slider
+        # Δημιουργία Slider για την επιλογή βημάτων από τον χρήστη
         self.slider = customtkinter.CTkSlider(self.tab_frame, from_=0, to=30, progress_color="orange", width=400,
                                               height=18, border_width=1)
 
         self.slider.grid(row=2, column=0, padx=(300, 1), pady=1, sticky="nw")
         self.slider.bind("<ButtonRelease-1>",
-                         self.update_count)  # bind the slider to a function to update the count label
-        self.slider.set(0)
+                         self.update_count)
 
-        self.slider_count = customtkinter.CTkLabel(self.tab_frame, text="0",
-                                                   font=('Arial', 18,))  # create the label to display the count
-        self.slider_count.grid(row=2, column=1, pady=(1, 50))
+        self.slider.set(0)  # Αρχικοποιούμε την τιμή του slider σε 0
+        # Όσο ο χρήστης κρατάει παρατεταμένα το αριστερό κουμπί του ποντικιού η συνάρτηση update count συνδέετε με τον
+        # slider και αυξομειώνει τα βήματα τα οποία προβάλλονται στο slider count label
         self.slider.bind("<B1-Motion>", self.update_count)
 
-        # Apply Steps Button
+        # Δημιουργία Label για την εμφάνιση των βημάτων κατά τη διάρκεια συρσίματος
+        self.slider_count = customtkinter.CTkLabel(self.tab_frame, text="0",
+                                                   font=('Arial', 18,))
+        self.slider_count.grid(row=2, column=1, pady=(1, 50))
+
+        # Κουμπί για τη δημιουργία των βημάτων
         self.slider_button = customtkinter.CTkButton(self.tab_frame, text="Apply Steps",
                                                      width=150, border_width=0, corner_radius=8,
                                                      font=('Arial', 13, 'bold'), command=self.create_text_boxes)
@@ -275,21 +270,20 @@ class Registration(customtkinter.CTk):
 
     def create_text_boxes(self):
 
-        # We use the value of slider
+        # Κρατάμε τα βήματα που προβάλλονται στο slider count σε μια μεταβλητή
         slider_value = int(self.slider_count.cget('text'))
 
-        # Check if the slider count is 0
+        # Χρησιμοποιούμε την τιμή για να κρύψουμε ή να εμφανίσουμε τους έξτρα τίτλους που δημιουργούνται
+        # Καλούμε τις κατάλληλες συναρτήσεις
         if slider_value == 0:
-            # If count is 0, hide the extra titles
             self.hide_extra_titles()
         else:
-            # If count is non-zero, show the extra titles
             self.show_extra_titles()
-
+        # Κρατάμε όλα τα widget σε μια μεταβλητή για να τα διατρέχουμε όλα μαζί
         widgets_to_remove = self.step_entry_boxes + self.subtract_button_timers + self.timers + self.add_button_timers + self.step_message_array + self.step_title_boxes
-        text_boxes_counter = 0
-        # Remove old textboxes
-        for widget in widgets_to_remove:
+        text_boxes_counter = 0  # Μετρητής βημάτων
+
+        for widget in widgets_to_remove:  # Διατρέχουμε και καταστρέφουμε τα widgets
             widget.destroy()
             if widget in self.timers:
                 self.timers.remove(widget)
@@ -304,11 +298,11 @@ class Registration(customtkinter.CTk):
             if widget in self.step_title_boxes:
                 self.step_title_boxes.remove(widget)
 
-        number_of_rec = int(self.slider.get())
+        number_of_rec = int(self.slider.get())  # Κρατάμε την τιμή του slider
 
-        # Create new textboxes
+        # Δημιουργούμε τα βήματα σύμφωνα με τη με την επιλογή του χρήστη (μέσω της μεταβλητής)
         for i in range(number_of_rec):
-            text_boxes_counter += 1
+            text_boxes_counter += 1  # Μετράμε τα βήματα κάθε φορά για τη σωστή ανανέωση τους
             textbox = customtkinter.CTkEntry(self.tab_frame, width=830, font=('Arial', 12), height=100)
             textbox.grid(row=8 + i, column=0, columnspan=5, pady=(20, 20), padx=(1, 1))
 
@@ -336,8 +330,8 @@ class Registration(customtkinter.CTk):
             add_button_third_step = customtkinter.CTkButton(self.tab_frame, text="+", width=100 - 6, height=32 - 6,
                                                             command=lambda index=i: self.add_button_callback(index))
             add_button_third_step.grid(row=8 + i, column=0, padx=(228, 1), pady=(250, 1))
-            # default value
 
+            # Προσθέτουμε τα widgets σε πίνακες για καλύτερη διαχείριση
             self.timers.append(entry_third_step)
             self.subtract_button_timers.append(subtract_button_third_step)
             self.add_button_timers.append(add_button_third_step)
@@ -346,9 +340,9 @@ class Registration(customtkinter.CTk):
             self.step_title_boxes.append(title_textbox)
             self.counter_of_text_boxes = text_boxes_counter
 
-    def show_extra_titles(self):
-        if self.extra_title is None:
-            # Create the extra title labels
+    def show_extra_titles(self):  # Μέθοδος που δημιουργεί τα extra titles όταν το κουμπί Apply steps πατηθεί
+        if self.extra_title is None:  # Έαν τα titles έχουν δημιουργηθεί δεν ξανά δημιουργούνται με το πάτημα του button
+
             self.extra_title = customtkinter.CTkLabel(self.tab_frame,
                                                       text="Enter the steps below:",
                                                       font=('Century Gothic', 24))
@@ -358,53 +352,51 @@ class Registration(customtkinter.CTk):
                                                        font=('Century Gothic', 12))
             self.extra_title2.grid(row=7, column=0, columnspan=4, padx=(1, 1), pady=(1, 1), sticky="nsew")
 
-    def hide_extra_titles(self):
+    def hide_extra_titles(self):  # Μέθοδος που κρύβει τα extra titles όταν ο slider είναι στο 0 και το button ξανά
+        # πατηθεί
         if self.extra_title is not None:
-            # Hide the extra title labels
             self.extra_title.grid_forget()
             self.extra_title2.grid_forget()
             self.extra_title = None
             self.extra_title2 = None
 
-    def add_button_callback(self, index):
-        if self.command is not None:
-            self.command()
+    # Μέθοδος που προσθέτει χρόνο στον κατάλληλο μετρητή περνώντας ως όρισμα κάθε φορά στη συνάρτηση change_spinbox_value
+    # Τον κατάλληλο times και το βήμα του χρόνου
+    def add_button_callback(self, index):  # Μέθοδος που προσθέτει χρόνο στον κατάλληλο μετρητή
         self.change_spinbox_value(self.timers[index], self.step_size)
-        self.current_timer_index = index
 
+    # Μέθοδος που αφαιρεί χρόνο στον κατάλληλο μετρητή περνώντας ως όρισμα κάθε φορά στη συνάρτηση change_spinbox_value
+    # Τον κατάλληλο times και το βήμα του χρόνου
     def subtract_button_callback(self, index):
-        if self.command is not None:
-            self.command()
         self.change_spinbox_value(self.timers[index], -self.step_size)
-        self.current_timer_index = index
 
-    def change_spinbox_value(self, entry_third_step, increment):
+    def change_spinbox_value(self, time, increment):
         try:
-            current_value = entry_third_step.get()
-            hours, minutes = map(int, current_value.split(':'))
+            current_value = time.get()  # Παίρνει τον χρόνο και τον περνάει σε μια μεταβλητή
+            hours, minutes = map(int, current_value.split(':'))  # Κάνει split σε λεπτά και ώρες και επιστρέφει int
+            # Δημιουργία αντικειμένου timedelta για τη σωστή αναπαράσταση του χρόνου
             current_time = timedelta(hours=hours, minutes=minutes)
-            new_time = current_time + timedelta(minutes=increment)
+            new_time = current_time + timedelta(minutes=increment)  # αυξάνει τα λεπτά
 
-            # Ensure that the time will be equal or higher of 00:00
+            # Έλεγχος για χρόνο μεγαλύτερο ή ίσο του μηδέν
             if new_time < timedelta():
                 new_time = timedelta()
 
-            hours, minutes = divmod(new_time.seconds // 60, 60)
-            formatted_time = f"{hours:11}:{minutes:02}"
+            hours, minutes = divmod(new_time.seconds // 60, 60)  # Υπολογισμός των λεπτών και των ωρών του νέου χρόνου
+            formatted_time = f"{hours:11}:{minutes:02}"  # Δημιουργία νέας σύμβολο σειράς με τα σωστά κενά
 
-            entry_third_step.delete(0, "end")
-            entry_third_step.insert(0, formatted_time)
+            time.delete(0, "end")  # Διαγραφεί της τρέχουσας τιμής time
+            time.insert(0, formatted_time)  # Εισαγωγή της νέας
         except ValueError:
             pass
 
-    def step1_time_changer(self, increment):
+    def step1_time_changer(self, increment):  # Η ίδια διαδικασία με πάνω για τον timer του Step 1
         try:
             current_value = self.time_displayer.get()
             hours, minutes = map(int, current_value.split(':'))
             current_time = timedelta(hours=hours, minutes=minutes)
             new_time = current_time + timedelta(minutes=increment)
 
-            # Ensure that the time will be equal or higher of 00:00
             if new_time < timedelta():
                 new_time = timedelta()
 
@@ -417,30 +409,27 @@ class Registration(customtkinter.CTk):
             pass
 
     def step1_add(self):
-        if self.command is not None:
-            self.command()
-            self.step1_time_changer(self.step_size)
+        self.step1_time_changer(self.step_size)
 
     def step1_subtract(self):
-        if self.command is not None:
-            self.command()
-            self.step1_time_changer(-self.step_size)
+        self.step1_time_changer(-self.step_size)
 
     def update_count(self, event):
-        # update the count label with the current slider value
+        # Ανανεώνει το label που δείχνει τα βήματα του counter
 
         self.slider_count.configure(text="{:01d}".format(int(self.slider.get())))  # format counter value
 
-    def clear_text(self, event):
+    def clear_text(self, event):  # Μόλις το event πραγματοποιηθεί διαγράφει το περιεχόμενο του text box
         if self.textbox.get("1.0",
                             "end-1c") == "A recipe has no soul.\nYou, as the cook, must bring soul to the recipe!":
             self.textbox.delete("1.0", "end")
 
+    # Μέθοδος για την ανανέωση της κάθε κατηγορίας ανάλογα με την επιλεγμένη κουζίνα
     def display_categories(self, event):
-        selected_cuisine = self.cuisine_box.get().strip()
+        selected_cuisine = self.cuisine_box.get().strip()  # Περνάμε την επιλογή κουζίνας σε μεταβλητή
 
-        categories = []
-
+        categories = []  # αρχικοποίηση πίνακα
+        # Ανάλογα με την επιλογή κουζίνας περνάμε την κατάλληλη κατηγορία μέσα στο categories
         if selected_cuisine == "Chinese":
             categories = self.chinese_categories
         elif selected_cuisine == "Mexican":
@@ -452,12 +441,13 @@ class Registration(customtkinter.CTk):
         elif selected_cuisine == "Arabic":
             categories = self.arabic_categories
 
-        # Clear the old categories from category_box
-        self.category_box.set(f"{'Choose Category':>48}")
-        # Set the categories as the values of category_box combobox
-        self.category_box.configure(values=categories)
 
-    def return_to_menu(self):
+        self.category_box.set(f"{'Choose Category':>48}")  # Ανανεώνουμε το spinbox
+
+        self.category_box.configure(values=categories)  # Περνάμε τις κατάλληλες τιμές στην κατηγορία
+
+    def return_to_menu(self):   # Επιστροφή στο μενού
+        # Καταστρέφουμε τα frames,widgets,grids του registration και επαναφέρουμε του menu
         self.main_frame.destroy()
         self.outside_frame.destroy()
         self.photoLabel.place(relx=0, rely=0, relwidth=1, relheight=1)
@@ -466,32 +456,33 @@ class Registration(customtkinter.CTk):
         self.parent.title("Let's Cook-Menu")
 
     def save_registration(self):
+        # Αμυντικός για κενά πεδία με αναδυόμενα παράθυρα
         if self.Recipe_name.get() == "":
-            # Display message to user that recipe name is empty
+
             messagebox.showerror("Error", "Recipe name cannot be empty.")
         elif self.textbox.get('1.0', 'end-1c') == "" \
                 or self.textbox.get('1.0', 'end-1c') == "A recipe has no soul.\nYou," \
                                                         " as the cook, must bring soul to the recipe!":
-            # Display message to user that textbox is empty
+
             messagebox.showerror("Error", "Ingredients cannot be empty.")
             # Special string arguments used to represent the starting and ending positions of a text widget's content.
         elif self.cuisine_box.get() == f"{'Choose Cuisine':>40}":
-            # Display message to user that recipe name is empty
+
             messagebox.showerror("Error", "Recipe Cuisine cannot be empty.")
         elif self.category_box.get() == f"{'Choose Category':>48}":
-            # Display message to user that recipe name is empty
+
             messagebox.showerror("Error", "Recipe Category cannot be empty.")
 
         elif self.difficulty_box.get() == f"{'Choose Level':>47}":
-            # Display message to user that recipe name is empty
+
             messagebox.showerror("Error", "Recipe Level cannot be empty.")
 
         elif self.time_displayer.get() == "                             0:00":
-            # Display message to user that recipe name is empty
+
             messagebox.showerror("Error", "Recipe Duration cannot be empty.")
-        #  self.slider.set(0)
+
         elif self.slider.get() == 0:
-            # Display message to user that recipe name is empty
+
             messagebox.showerror("Error", "Steps cannot be zero.")
 
         else:

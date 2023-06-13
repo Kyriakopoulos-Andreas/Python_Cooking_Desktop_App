@@ -1,5 +1,5 @@
-import customtkinter
-from intro import Intro
+from imports import *
+
 
 
 
