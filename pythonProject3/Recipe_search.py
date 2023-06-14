@@ -359,8 +359,10 @@ class Recipe_search(customtkinter.CTk):
             self.combobox.destroy()
             self.category_box.destroy()
             self.difficulty_box.destroy()
+            self.filtersOn = False
         else:
             self.display_filters()  # Καλούμε τη συνάρτηση που εμφανίζει τα φίλτρα
+            self.filtersOn = True
 
     def display_categories(self, event):  # Κρατάμε την επιλογή χρήστη για κουζίνα και ανάλογα εμφανίζουμε τις
         # Κατάλληλες κατηγορίες ανάλογα με την κουζίνα
@@ -913,32 +915,59 @@ class Recipe_search(customtkinter.CTk):
 
     def search_but(self):
         if self.filtersOn:
-            if self.search_name.index("end") == 0:
-                query = "SELECT * FROM Recipe WHERE cuisine=? AND category=? AND difficulty=?"
-                cuisine = self.combobox.get().strip()
-                category = self.category_box.get().strip()
-                diff = self.difficulty_box.get().strip()
-                cursor.execute(query, (cuisine, category, diff))
-                search_recipes = cursor.fetchall()
-                for row in self.tree_view.get_children():
-                    self.tree_view.delete(row)
-                for recipe in search_recipes:
-                    self.tree_view.insert("", "end", text="Item 1",
-                                          values=(recipe[0], recipe[1], recipe[2], recipe[3], recipe[4]))
-                return False
+            if not self.search_name.get():
+                if not self.category_box.get().strip() == 'Choose Category':
+                    query = "SELECT * FROM Recipe WHERE cuisine=? AND category=? AND difficulty=?"
+                    cuisine = self.combobox.get().strip()
+                    category = self.category_box.get().strip()
+                    diff = self.difficulty_box.get().strip()
+                    cursor.execute(query, (cuisine, category, diff))
+                    search_recipes = cursor.fetchall()
+                    for row in self.tree_view.get_children():
+                        self.tree_view.delete(row)
+                    for recipe in search_recipes:
+                        self.tree_view.insert("", "end", text="Item 1",
+                                              values=(recipe[0], recipe[1], recipe[2], recipe[3], recipe[4]))
+                    return False
+                else:
+                    query = "SELECT * FROM Recipe WHERE cuisine=? AND difficulty=?"
+                    cuisine = self.combobox.get().strip()
+                    diff = self.difficulty_box.get().strip()
+                    cursor.execute(query, (cuisine, diff))
+                    search_recipes = cursor.fetchall()
+                    for row in self.tree_view.get_children():
+                        self.tree_view.delete(row)
+                    for recipe in search_recipes:
+                        self.tree_view.insert("", "end", text="Item 1",
+                                              values=(recipe[0], recipe[1], recipe[2], recipe[3], recipe[4]))
+                    return False
             else:
-                query = "SELECT * FROM Recipe WHERE name=? AND cuisine=? AND category=? AND difficulty=?"
-                cursor.execute(query, (
-                    self.search_name.get(), self.combobox.get(), self.category_box.get(), self.difficulty_box.get()))
-                search_recipes = cursor.fetchall()
-                for row in self.tree_view.get_children():
-                    self.tree_view.delete(row)
-                for recipe in search_recipes:
-                    self.tree_view.insert("", "end", text="Item 1",
-                                          values=(recipe[0], recipe[1], recipe[2], recipe[3], recipe[4]))
-                return False
+                if not self.category_box.get().strip() == 'Choose Category':
+                    query = "SELECT * FROM Recipe WHERE name=? AND cuisine=? AND category=? AND difficulty=?"
+                    cursor.execute(query, (
+                    self.search_name.get(), self.combobox.get().strip(), self.category_box.get().strip(),
+                    self.difficulty_box.get().strip()))
+                    search_recipes = cursor.fetchall()
+                    for row in self.tree_view.get_children():
+                        self.tree_view.delete(row)
+                    for recipe in search_recipes:
+                        self.tree_view.insert("", "end", text="Item 1",
+                                              values=(recipe[0], recipe[1], recipe[2], recipe[3], recipe[4]))
+                    return False
+                else:
+                    query = "SELECT * FROM Recipe WHERE name=? AND cuisine=? AND difficulty=?"
+                    cursor.execute(query, (
+                        self.search_name.get(), self.combobox.get().strip(),
+                        self.difficulty_box.get().strip()))
+                    search_recipes = cursor.fetchall()
+                    for row in self.tree_view.get_children():
+                        self.tree_view.delete(row)
+                    for recipe in search_recipes:
+                        self.tree_view.insert("", "end", text="Item 1",
+                                              values=(recipe[0], recipe[1], recipe[2], recipe[3], recipe[4]))
+                    return False
         else:
-            if self.search_name.index("end") == 0:
+            if not self.search_name.get():
                 cursor.execute("SELECT * FROM Recipe")
                 recipes = cursor.fetchall()
                 for row in self.tree_view.get_children():
