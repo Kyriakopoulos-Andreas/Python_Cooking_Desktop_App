@@ -1,15 +1,23 @@
 import sqlite3
 import tkinter
+
 from imports import *
 from tkinter import ttk
 from Lets_Cook import Lets_Cook
+import os
+
+file_path = os.path.dirname(__file__)
 conn = sqlite3.connect("Recipes.db")
 cursor = conn.cursor()
+total_minutes = 0
+total_minutes1 = 0
 
 
 class Recipe_search(customtkinter.CTk):
     def __init__(self, parent_menu, photo_label, buttons_frame, exit_button):
         super().__init__()
+        self.time_var = tk.StringVar()
+        self.calculated_duration_vars = []
         # Αρχικοποιήσεις Μεταβλητών
         self.counter_db = 0
         self.Recipe_name = None
@@ -20,7 +28,6 @@ class Recipe_search(customtkinter.CTk):
         self.photoLabel = photo_label
         self.buttons_frame = buttons_frame
         self.exit_button = exit_button
-
         self.new_index = None
         self.new_step_button = None
         self.new_step_title = None
@@ -37,7 +44,7 @@ class Recipe_search(customtkinter.CTk):
         self.delete_step_photo = None
         self.delete_step_img = None
         self.add_button_third_step = None
-        self.step_counter1 = None
+        self.stepp_counter = None
         self.counter_of_text_boxes = None
         self.current_timer_index = None
         self.tab3_text_boxes = []
@@ -72,13 +79,14 @@ class Recipe_search(customtkinter.CTk):
         self.difficulty_box = None
         self.thai_categories = None
         self.mediterranean_categories = None
-        self.italian_categories = None
         self.mexican_categories = None
         self.chinese_categories = None
         self.combobox = None
-        self.step_counter1 = 0
+        self.stepp_counter = 0
         self.filtersOn = False
+
         self.steps_visible = False
+
         self.filter_counter = 0
 
         self.parent.title("Let's Cook-Recipe Search")  # Αλλαγή επικεφαλίδας προγράμματος
@@ -131,57 +139,41 @@ class Recipe_search(customtkinter.CTk):
                                                    width=60, height=30, corner_radius=15, command=self.back_to_menu)
         self.back_button.grid(row=90, column=0, padx=0, pady=(50, 1), sticky="w")
         # Εισαγωγή Εικόνας κουμπιού για το edit
-        self.edit_img = Image.open(r"C:\Users\Admin\PycharmProjects\pythonProject3\logo\spoon.png")
+        self.edit_img = Image.open(str(file_path) + "\\logo\\spoon.png")
         self.edit_img = self.edit_img.resize((24, 24))  # Resize της εικόνας
         self.edit_photo = customtkinter.CTkImage(self.edit_img)  # Δημιουργία αντικειμένου τύπου εικόνας
-
         # Δημιουργία κουμπιού edit και καταχώριση της εικόνας στο κουμπί
-
         self.editing_button = customtkinter.CTkButton(self.bottom_frame, text="Edit Recipe", image=self.edit_photo,
                                                       width=130, height=40, corner_radius=15, command=self.editing
                                                       )
         self.editing_button.grid(row=0, column=0, padx=(1, 10), pady=(30, 30), sticky="e")
-
         # Εισαγωγή Εικόνας κουμπιού για το exit
-
-        self.delete_img = Image.open(r"C:\Users\Admin\PycharmProjects\pythonProject3\logo\x.png")
+        self.delete_img = Image.open(str(file_path) + "\\logo\\x.png")
         self.delete_img = self.delete_img.resize((24, 24))
         self.delete_photo = customtkinter.CTkImage(self.delete_img)
-
         # Δημιουργία κουμπιού exit και καταχώριση της εικόνας στο κουμπί
-
         self.delete_button = customtkinter.CTkButton(self.bottom_frame, text="Delete Recipe", image=self.delete_photo,
                                                      width=130, height=40, corner_radius=15, command=self.delete
                                                      )
         self.delete_button.grid(row=0, column=4, padx=(1, 10), pady=(30, 30), sticky="w")
-
         # Εισαγωγή Εικόνας κουμπιού για το lets cook
-
-        self.img = Image.open(r"C:\Users\Admin\PycharmProjects\pythonProject3\logo\chef.png")
+        self.img = Image.open(str(file_path) + "\\logo\\chef.png")
         self.img = self.img.resize((24, 24))
         self.photo = customtkinter.CTkImage(self.img)
-
         # Δημιουργία κουμπιού υλοποίησης συνταγής και καταχώριση της εικόνας στο κουμπί
-
         self.cook_button = customtkinter.CTkButton(self.bottom_frame, text="Let's Cook", image=self.photo,
                                                    width=130, height=40, corner_radius=15,
                                                    command=self.lets_cook_window)
         self.cook_button.grid(row=0, column=2, padx=(1, 1), pady=(30, 30), sticky="nsew")
-
         # Εισαγωγή Εικόνας κουμπιού για το search
-
-        self.search_img = Image.open(r"C:\Users\Admin\PycharmProjects\pythonProject3\logo\search.png")
+        self.search_img = Image.open(str(file_path) + "\\logo\\search.png")
         self.search_img = self.search_img.resize((24, 24))
         self.search_photo = customtkinter.CTkImage(self.search_img)
-
         # Δημιουργία κουμπιού εύρεσης και καταχώριση της εικόνας στο κουμπί
-
         self.search_button = customtkinter.CTkButton(self.left_inside_frame, text="Search", image=self.search_photo,
                                                      width=240, height=40, command=self.search_but)
         self.search_button.grid(row=3, column=0, padx=0, pady=(10, 1), )
-
         # Δημιουργία frame για την εμφάνιση των συνταγών
-
         self.information_frame = customtkinter.CTkFrame(self.inside_frame, height=360,
                                                         width=670, border_width=3,
                                                         border_color=("#3673F8", "orange",)
@@ -190,25 +182,20 @@ class Recipe_search(customtkinter.CTk):
                                     sticky="nsew")
         self.information_frame.columnconfigure((0, 1, 2, 3, 4), weight=1)
         self.information_frame.rowconfigure((0, 1, 2, 3, 4), weight=1)
-
         # Εισαγωγή ονομάτων στις στήλες του treeview
         self.columns = ('id', 'recipe_name', 'cuisine', 'category', 'level')
-
         #  Δημιουργία TreeView frame
-
         self.tree_view = ttk.Treeview(self.information_frame, columns=self.columns, selectmode='browse',
                                       show='headings')
         self.tree_view.grid(row=0, column=0, columnspan=8, rowspan=8, sticky="nsew", padx=(3, 3), pady=(3, 3))
         self.tree_view.columnconfigure((0, 1, 2, 3, 4), weight=1)
         self.tree_view.rowconfigure((0, 1, 2, 3, 4), weight=1)
-
         # Καθορισμός διαστάσεων των στηλών
         self.tree_view.column('id', anchor='c', minwidth=1, width=50)
         self.tree_view.column('recipe_name', anchor='c', minwidth=1, width=200)
         self.tree_view.column('cuisine', anchor='c', minwidth=1, width=150)
         self.tree_view.column('category', anchor='c', minwidth=1, width=150)
         self.tree_view.column('level', anchor='c', minwidth=1, width=100)
-
         # Εισαγωγή ονομάτων στις στήλες του treeview
         self.tree_view.heading('id', text='ID')
         self.tree_view.heading('recipe_name', text='Recipe Name')
@@ -221,7 +208,6 @@ class Recipe_search(customtkinter.CTk):
         recipes = cursor.fetchall()
 
         for recipe in recipes:
-            print(recipe[6])
             self.tree_view.insert("", "end", text="Item 1",
                                   values=(recipe[0], recipe[1], recipe[2], recipe[3], recipe[4]))
         self.appearance_mode = ctk.get_appearance_mode()
@@ -230,10 +216,10 @@ class Recipe_search(customtkinter.CTk):
 
         if self.appearance_mode == "Dark":  # Διαμόρφωση χρωμάτων και στυλ του Treeview αν το mode είναι Black
             self.style.theme_use("default")
-            self.treeview_back_round = "#2a2d2e"
+            self.treeview_backround = "#2a2d2e"
             self.treeview_foreground = "white"
-            self.treeview_field_back_ground = "#343638"
-            self.treeview_border_color = "#343638"
+            self.treeview_fieldbackground = "#343638"
+            self.treeview_bordercolor = "#343638"
 
             self.treeview_heading_background = "#447183"
             self.treeview_heading_foreground = "white"
@@ -246,10 +232,10 @@ class Recipe_search(customtkinter.CTk):
 
 
         elif self.appearance_mode == "Light":  # Διαμόρφωση χρωμάτων και στυλ του Treeview αν το mode είναι Light
-            self.treeview_back_round = "#D0D3D4"
+            self.treeview_backround = "#D0D3D4"
             self.treeview_foreground = "#000000"
-            self.treeview_field_back_ground = "#343638"
-            self.treeview_border_color = "#343638"
+            self.treeview_fieldbackground = "#343638"
+            self.treeview_bordercolor = "#343638"
             self.style.theme_use("vista")  # Αλλάζει το θέμα του treeview
 
             self.treeview_heading_background = "#3484F0"
@@ -261,11 +247,11 @@ class Recipe_search(customtkinter.CTk):
             self.scrollbar_color = "#3484F0"
 
         self.style.configure("Treeview",
-                             background=self.treeview_back_round,
+                             background=self.treeview_backround,
                              foreground=self.treeview_foreground,
                              rowheight=25,
-                             fieldbackground=self.treeview_field_back_ground,
-                             bordercolor=self.treeview_border_color,
+                             fieldbackground=self.treeview_fieldbackground,
+                             bordercolor=self.treeview_bordercolor,
                              borderwidth=1, font=('Century Gothic', 12, 'bold'), )
 
         self.style.configure("Treeview.Heading",
@@ -298,14 +284,11 @@ class Recipe_search(customtkinter.CTk):
                                                         f"{'Thai':^45}"])
 
         self.combobox.grid(row=1, column=0, padx=(1, 1), pady=(1, 20))
-
         # Δημιουργία λιστών για τις κατηγορίες
-
         self.chinese_categories = ["BaoBan", "Noodles", "Sushi", "Ramen", "Soups", "Rice Dish", "Bowl",
                                    "Street Food"]
         self.mexican_categories = ["Tacos", "Burritos", "Enchiladas", "Fajitas", "Quesadilla", "Nachos"]
-        self.italian_categories = ["Pizza", "Pasta", "Lasagna", "Risotto", "Dessert"]
-        self.mediterranean_categories = ["Sea Food", "Meet", "Salad", "Vegetable", "Legumes", "Pie", "Pasta's",
+        self.mediterranean_categories = ["Sea Food", "Meet", "Salad", "Vegetable", "Legumes", "Pie", "Pasta",
                                          "Dessert"]
         self.thai_categories = ["Sea Food", "Soups", "Curries", "Pounded", "Noodles", "Rice Dish", "Salads"]
         self.arabic_categories = ["Shakshuka", "Lahmacun", "Falafel", "Hummus", "Kebab", "Salad", "Dessert"
@@ -314,7 +297,6 @@ class Recipe_search(customtkinter.CTk):
         self.format_categories = [
             self.chinese_categories,
             self.mexican_categories,
-            self.italian_categories,
             self.mediterranean_categories,
             self.thai_categories,
             self.arabic_categories
@@ -360,9 +342,10 @@ class Recipe_search(customtkinter.CTk):
             self.category_box.destroy()
             self.difficulty_box.destroy()
             self.filtersOn = False
+
         else:
-            self.display_filters()  # Καλούμε τη συνάρτηση που εμφανίζει τα φίλτρα
             self.filtersOn = True
+            self.display_filters()  # Καλούμε τη συνάρτηση που εμφανίζει τα φίλτρα
 
     def display_categories(self, event):  # Κρατάμε την επιλογή χρήστη για κουζίνα και ανάλογα εμφανίζουμε τις
         # Κατάλληλες κατηγορίες ανάλογα με την κουζίνα
@@ -388,26 +371,30 @@ class Recipe_search(customtkinter.CTk):
 
     def back_to_menu(self):  # Μέθοδος επιστροφής στο μενού που καταστρέφει τα widget του παρόν παραθύρου και εμφανίζει
         # Τα widget του μενού
+        for after_id in self.tk.eval('after info').split():
+            self.after_cancel(after_id)
         self.left_frame.destroy()
+        for after_id in self.tk.eval('after info').split():
+            self.after_cancel(after_id)
         self.center_frame.destroy()
         self.photoLabel.place(relx=0, rely=0, relwidth=1, relheight=1)
         self.buttons_frame.grid()
         self.exit_button.grid(row=5, column=2, padx=0, pady=0)
         self.parent.title("Let's Cook-Menu")  # Αλλαγή επικεφαλίδας εφαρμογής σε μενού
+        global total_minutes, total_minutes1
+        total_minutes = 0
+        total_minutes1 = 0
 
         # Το editing αποτελεί το παράθυρο τροποποίησης μιας συνταγής
 
     def editing(self):
-
         selectedRow = self.tree_view.focus()
         if not selectedRow:
             return
         self.center_frame.grid_remove()  # Κάνουμε remove τα frame του παραθύρου search
         self.parent.title("Let's Cook-Editing")  # Αλλάζουμε την επικεφαλίδα εφαρμογής
         self.left_frame.grid_remove()
-
         # Δημιουργούμε τα frames και τα κουμπιά του editing παραθύρου
-
         self.editing_frame = customtkinter.CTkFrame(self.parent, width=850, corner_radius=20, height=80)
         self.editing_frame.grid(row=0, column=1, columnspan=7, rowspan=5, sticky="nsew", padx=(20, 20), pady=(20, 20))
         self.editing_frame.grid_rowconfigure(4, weight=0)
@@ -427,9 +414,7 @@ class Recipe_search(customtkinter.CTk):
                                                     corner_radius=15,
                                                     command=self.exit)
         self.exit_editing.grid(row=4, column=1, padx=(1, 1560), pady=(50, 1), sticky="se")
-
         # Δημιουργία scrollable frame και κατάλληλων πεδίων καταχωρίσεων για να γίνουν οι τροποποιήσεις
-
         self.scrollable_frame = customtkinter.CTkScrollableFrame(self.editing_frame, height=840,
                                                                  scrollbar_button_hover_color="#3786D9",
                                                                  width=1730, corner_radius=12, border_width=5,
@@ -455,9 +440,7 @@ class Recipe_search(customtkinter.CTk):
                                                   height=30,
                                                   border_width=1, corner_radius=10)
         self.search_name.grid(row=2, column=0, padx=(550, 1), pady=(150, 1), sticky="s")
-
         # Δημιουργία timer για αλλαγή της διάρκειας της συνταγής
-
         self.time_duration = customtkinter.CTkLabel(self.scrollable_frame, text="Edit Recipe Duration:",
                                                     font=('Century Gothic', 30))
         self.time_duration.grid(row=5, column=0, padx=(350, 1), pady=(50, 40), sticky="nw")
@@ -467,8 +450,8 @@ class Recipe_search(customtkinter.CTk):
                                                        command=self.step1_subtract)
         self.subtract_button.grid(row=7, column=0, padx=(20, 1), pady=8)
 
-        self.entry = customtkinter.CTkEntry(self.scrollable_frame, width=500, height=26,
-                                            border_width=0)
+        self.entry = customtkinter.CTkEntry(self.scrollable_frame, width=500, height=26, border_width=0,
+                                            textvariable=self.time_var, state="readonly")
         self.entry.grid(row=7, column=0, padx=(680, 1), pady=8, sticky="w")
 
         self.add_button = customtkinter.CTkButton(self.scrollable_frame, text="+", width=100 - 6, height=32 - 6,
@@ -476,7 +459,6 @@ class Recipe_search(customtkinter.CTk):
         self.add_button.grid(row=7, column=0, padx=(1058, 1), pady=8)
 
         # Δημιουργία text box για τα υλικά
-
         self.ingredients_title = customtkinter.CTkLabel(self.scrollable_frame, text="Edit Recipe Ingredients:",
                                                         font=('Century Gothic', 30))
         self.ingredients_title.grid(row=8, column=0, padx=(350, 1), pady=(70, 72), sticky="nw")
@@ -490,9 +472,7 @@ class Recipe_search(customtkinter.CTk):
         self.steps_title = customtkinter.CTkLabel(self.scrollable_frame, text="Edit Recipe Steps:",
                                                   font=('Century Gothic', 30))
         self.steps_title.grid(row=10, column=0, padx=(350, 1), pady=(50, 1), sticky="nw")
-
         # Δημιουργία Κουμπιού step για την εμφάνιση των βημάτων
-
         self.steps_button = customtkinter.CTkButton(self.scrollable_frame, text="Steps", width=280,
                                                     height=33,
                                                     corner_radius=15,
@@ -505,17 +485,22 @@ class Recipe_search(customtkinter.CTk):
         cursor.execute(sql_query, (self.values[0],))
         self.recipe = cursor.fetchall()
         self.search_name.insert(0, self.values[1])
-        self.entry.insert(0, f"{' ':>68}" + str(self.recipe[0][5]))
+        self.time_var.set(f"{' ':>68}" + str(self.recipe[0][5]))
+        global total_minutes1
+        time_value = self.time_var.get().strip()  # Retrieve the time value and remove leading/trailing spaces
+        minutes, seconds = map(int, time_value.split(':'))  # Split the value into minutes and seconds
+
+        # Convert minutes and seconds to total minutes
+        total_minutes1 = minutes + (seconds / 60)
 
     def create_text_boxes(self):
-
         # Μέθοδος που ελέγχει αν τα widget τών βημάτων έχουν δημιουργηθεί είδη μια φορά με το πάτημα του κουμπιού steps
         # Σε περίπτωση που δεν έχουν δημιουργηθεί τότε δημιουργεί τα widgets των βημάτων
         # Σε περίπτωση που αυτά έχουν δημιουργηθεί με δεύτερο πάτημα του κουμπιού τα κρύβει
         # Με τρίτο πάτημα δεν ξανά δημιουργεί τα κουμπιά αλλά τα εμφανίζει
 
         if self.steps_visible:
-
+            # Hide the steps
             for textbox in self.tab3_text_boxes:
                 textbox.grid_forget()
             for button in self.subtract_button_timers:
@@ -549,7 +534,6 @@ class Recipe_search(customtkinter.CTk):
                 delete_button.grid(row=12 + i, column=1, padx=(1, 1), pady=(40, 1), sticky="e")
             for i, timer in enumerate(self.timers):
                 timer.grid(row=12 + i, column=0, padx=(543, 1), pady=(350, 1))
-
             # Δημιουργία τίτλου και νέου κουμπιού για την προσθήκη νέων βημάτων
             self.new_step_title = customtkinter.CTkLabel(self.scrollable_frame, text="Step Addition:",
                                                          font=('Century Gothic', 30))
@@ -561,14 +545,14 @@ class Recipe_search(customtkinter.CTk):
                                                            command=self.add_new_step)
             self.new_step_button.grid(column=0, row=11, padx=(1, 205), pady=(1, 1), sticky="se")
             self.steps_visible = True
-
+            # Create new textboxes
         if not self.steps_created:
             sql_query = "SELECT COUNT(stepId)FROM Step WHERE recipeId=?;"
             cursor.execute(sql_query, (self.values[0],))
             numberOfSteps = cursor.fetchall()
             for i, _ in enumerate(range(int(numberOfSteps[0][0]))):  # Δημιουργία των κατάλληλων βημάτων που είδη έχει
                 # Η συνταγή
-                self.step_counter1 += 1
+                self.stepp_counter += 1
                 self.textbox = customtkinter.CTkEntry(self.scrollable_frame, width=670, font=('Arial', 12), height=150)
                 self.textbox.grid(row=12 + i, column=0, pady=(150, 100), padx=(550, 1), sticky="w")
 
@@ -587,10 +571,12 @@ class Recipe_search(customtkinter.CTk):
                                                                               index=i: self.subtract_button_callback(
                                                                               index))
                 self.subtract_button_third_step.grid(row=12 + i, column=0, padx=(103, 1), pady=(350, 1))
+                calculated_duration_var = tkinter.StringVar()
+                self.calculated_duration_vars.append(calculated_duration_var)
 
                 self.entry_third_step = customtkinter.CTkEntry(self.scrollable_frame, width=350, height=32 - 6,
-                                                               border_width=0)
-
+                                                               border_width=0, textvariable=calculated_duration_var,
+                                                               state='readonly')
                 self.entry_third_step.grid(row=12 + i, column=0, padx=(543, 1), pady=(350, 1))
 
                 self.add_button_third_step = customtkinter.CTkButton(self.scrollable_frame, text="+", width=100 - 6,
@@ -598,13 +584,11 @@ class Recipe_search(customtkinter.CTk):
                                                                      command=lambda index=i: self.add_button_callback(
                                                                          index))
                 self.add_button_third_step.grid(row=12 + i, column=0, padx=(985, 1), pady=(350, 1))
-
                 # Δημιουργία κουμπιών διαγραφής για το κάθε βήμα
                 # Εισαγωγή εικόνας στο κάθε κουμπί
-                self.delete_step_img = Image.open(r"C:\Users\Admin\Desktop\logo\x.png")
+                self.delete_step_img = Image.open(str(file_path) + "\\logo\\x.png")
                 self.delete_step_img = self.delete_img.resize((24, 24))
                 self.delete_step_photo = customtkinter.CTkImage(self.delete_step_img)
-
                 # Περνάμε το δείκτη κουμπιού Index στη συνάρτηση delete_button_callback έτσι ώστε κάθε κουμπί να έχει
                 # ξεχωριστή θέση και η μέθοδος να καταλαβαίνει το κουμπί
                 self.delete_button = customtkinter.CTkButton(self.scrollable_frame, text="", width=100 - 6,
@@ -629,15 +613,26 @@ class Recipe_search(customtkinter.CTk):
             cursor.execute(sql_query, (selectedRecipe[0],))
             selectedSteps = cursor.fetchall()
             text_boxes_counter = 0
+            global total_minutes
             for step in selectedSteps:
                 self.title_textbox_array[text_boxes_counter].insert(tkinter.INSERT, step[1])
                 self.tab3_text_boxes[text_boxes_counter].insert(tkinter.INSERT, step[2])
                 self.timers[text_boxes_counter].insert(0, f"{' ':>50}" + str(step[3]))
+                self.calculated_duration_vars[text_boxes_counter].set(f"{' ':>50}" + str(step[3]))
+                self.timers[text_boxes_counter].configure(
+                    textvariable=self.calculated_duration_vars[text_boxes_counter])
+                minutes, seconds = map(int, step[3].split(':'))
+                total_minutes += minutes
+                total_minutes += seconds / 60
                 text_boxes_counter += 1
+            total_minutes = int(total_minutes)
+            calculated_duration_var = tkinter.StringVar()
+            calculated_duration_var.set(f"{' ':>68}{total_minutes}")
+            self.entry.insert(0, calculated_duration_var.get())
 
     def add_new_step(self):
-        new_index = self.step_counter1  # Περνάμε τον υπάρχων αριθμό βημάτων σε μια μεταβλητή
-        self.step_counter1 += 1  # Αυξάνουμε τον αριθμητή κατά ένα step
+        new_index = self.stepp_counter   # Περνάμε τον υπάρχων αριθμό βημάτων σε μια μεταβλητή
+        self.stepp_counter += 1
 
         # Δημιουργούμε το νέο step και στη γραμμή προσθέτουμε το new_index για να πάρει τη σωστή θέση
         self.textbox = customtkinter.CTkEntry(self.scrollable_frame, width=670, font=('Arial', 12), height=150)
@@ -659,6 +654,7 @@ class Recipe_search(customtkinter.CTk):
         self.entry_third_step = customtkinter.CTkEntry(self.scrollable_frame, width=350, height=32 - 6, border_width=0)
         self.entry_third_step.grid(row=1 + 12 + new_index, column=0, padx=(543, 1), pady=(350, 1))
         self.entry_third_step.insert(0, f"{' ':>50}0:00")
+        self.entry_third_step.configure(state='readonly')  # Disable the widget
 
         self.add_button_third_step = customtkinter.CTkButton(self.scrollable_frame, text="+", width=100 - 6,
                                                              height=32 - 6,
@@ -666,7 +662,7 @@ class Recipe_search(customtkinter.CTk):
                                                                  index))
         self.add_button_third_step.grid(row=1 + 12 + new_index, column=0, padx=(985, 1), pady=(350, 1))
 
-        self.delete_step_img = Image.open(r"C:\Users\Admin\Desktop\logo\x.png")
+        self.delete_step_img = Image.open(str(file_path) + "\\logo\\x.png")
         self.delete_step_img = self.delete_img.resize((24, 24))
         self.delete_step_photo = customtkinter.CTkImage(self.delete_step_img)
         self.delete_button = customtkinter.CTkButton(self.scrollable_frame, text="", width=100 - 6, height=32 - 6,
@@ -684,9 +680,9 @@ class Recipe_search(customtkinter.CTk):
         self.title_textbox_array.append(self.title_textbox)
 
     def delete_button_callback(self, index):
-
         # Μέθοδος που διαγράφει κάποιο βήμα
         # Καλούμε την μέθοδο destroy για να διαγράψουμε τα widget που δείχνει ο δείκτης
+
         self.subtract_button_timers[index].destroy()
         self.add_button_timers[index].destroy()
         self.tab3_text_boxes[index].destroy()
@@ -705,8 +701,7 @@ class Recipe_search(customtkinter.CTk):
         del self.delete_buttons[index]
 
         # Ανανεώνουμε τον μετρητή βημάτων
-        self.step_counter1 -= 1
-
+        self.stepp_counter -= 1
         # Κάνουμε αναδιάταξη των βημάτων μετά το σβήσιμο κάποιου βήματος ώστε όλα να βρίσκονται διαδοχικά το ένα μετά το
         # άλλο
 
@@ -731,35 +726,46 @@ class Recipe_search(customtkinter.CTk):
     def add_button_callback(self, index):
         # Αυξάνει τον μετρητή περνώντας ως όρισμα το βήμα στη συνάρτηση change_spinbox_value
         self.change_spinbox_value(self.timers[index], self.step_size)
+        global total_minutes
+        total_minutes += 3
+        if total_minutes > total_minutes1:
+            messagebox.showerror("Error", "Ο χρόνος των βημάτων ξεπερνά τον συνολικό χρόνο εκτέλεσης της συνταγής.")
 
     def subtract_button_callback(self, index):
         # Μειώνει τον μετρητή περνώντας ως όρισμα το μειωμένο βήμα στη συνάρτηση change_spinbox_value
+        global total_minutes
+        if self.timers[index].get() != '00:00':
+            total_minutes -= 3
         self.change_spinbox_value(self.timers[index], -self.step_size)
 
-    def change_spinbox_value(self, time, increment):
-        try:
-            current_value = time.get()  # Παίρνει τον χρόνο και τον περνάει σε μια μεταβλητή
-            hours, minutes = map(int, current_value.split(':'))  # Κάνει split σε λεπτά και ώρες και επιστρέφει int
-            # Δημιουργία αντικειμένου timedelta για τη σωστή αναπαράσταση του χρόνου
-            current_time = timedelta(hours=hours, minutes=minutes)
-            new_time = current_time + timedelta(minutes=increment)  # αυξάνει τα λεπτά
+    def change_spinbox_value(self, entry_third_step, increment):
+        if entry_third_step.winfo_exists():
+            try:
+                current_value = entry_third_step.get()# Παίρνει τον χρόνο και τον περνάει σε μια μεταβλητή
+                hours, minutes = map(int, current_value.split(':'))
+                # Κάνει split σε λεπτά και ώρες και επιστρέφει int
+                # Δημιουργία αντικειμένου timedelta για τη σωστή αναπαράσταση του χρόνου
+                current_time = timedelta(hours=hours, minutes=minutes)
+                new_time = current_time + timedelta(minutes=increment)
+                # αυξάνει τα λεπτά
+                # Έλεγχος για χρόνο μεγαλύτερο ή ίσο του μηδέν
+                if new_time < timedelta():
+                    new_time = timedelta()
 
-            # Έλεγχος για χρόνο μεγαλύτερο ή ίσο του μηδέν
-            if new_time < timedelta():
-                new_time = timedelta()
+                hours, minutes = divmod(new_time.seconds // 60, 60) # Υπολογισμός των λεπτών και των ωρών του νέου χρόνου
+                formatted_time = f"{hours:51}:{minutes:02}"  # Δημιουργία νέας σύμβολο σειράς με τα σωστά κενά
 
-            hours, minutes = divmod(new_time.seconds // 60, 60)  # Υπολογισμός των λεπτών και των ωρών του νέου χρόνου
-            formatted_time = f"{hours:51}:{minutes:02}"  # Δημιουργία νέας σύμβολο σειράς με τα σωστά κενά
-
-            time.delete(0, "end")  # Διαγραφεί της τρέχουσας τιμής time
-            time.insert(0, formatted_time)  # Εισαγωγή της νέας
-        except ValueError:
-            pass
+                entry_third_step.configure(state='normal')  # Enable the widget temporarily
+                entry_third_step.delete(0, "end")
+                entry_third_step.insert(0, formatted_time)
+                entry_third_step.configure(state='readonly')  # Disable the widget again
+            except ValueError:
+                pass
 
     def ingredients_text_box(self):
         # Συνάρτηση που δημιουργεί η κρύβει το ingredients textbox με το πάτημα του κουμπιού ingredients
         if self.text_box_visible:
-            self.ingredients_textbox.grid_forget()
+            self.ingredients_textbox.grid_forget()  # hide the text box
             self.text_box_visible = False
         else:
             if not self.text_box_created:
@@ -778,81 +784,75 @@ class Recipe_search(customtkinter.CTk):
     def step1_time_changer(self, increment):
         # Μέθοδος που διαχειρίζεται των χρόνο για τη συνταγή όπως το change spinbox value
         try:
-            current_value = self.entry.get()
-            hours, minutes = map(int, current_value.split(':'))
+            current_value = self.time_var.get()
+            hours, minutes = map(int, current_value.strip().split(':'))
             current_time = timedelta(hours=hours, minutes=minutes)
             new_time = current_time + timedelta(minutes=increment)
-
             if new_time < timedelta():
                 new_time = timedelta()
-
             hours, minutes = divmod(new_time.seconds // 60, 60)
             formatted_time = f"{hours:69}:{minutes:02}"
-
-            self.entry.delete(0, "end")
-            self.entry.insert(0, formatted_time)
+            self.time_var.set(formatted_time)
         except ValueError:
             pass
 
     def step1_add(self):
         # Μέθοδος που προσθέτει χρόνο στη συνταγή καλώντας τη συνάρτηση step1_time_changer και περνώντας ως όρισμα το
         # βήμα
-        self.step1_time_changer(self.step_size)
+        if self.command is not None:
+            self.command()
+            self.step1_time_changer(self.step_size)
+            global total_minutes1
+            total_minutes1 += 3
 
     def step1_subtract(self):
         # Μέθοδος που μειώνει χρόνο στη συνταγή καλώντας τη συνάρτηση step1_time_changer και περνώντας ως όρισμα το
         # μειωμένο βήμα
-        self.step1_time_changer(-self.step_size)
+        if self.command is not None:
+            self.command()
+            self.step1_time_changer(-self.step_size)
+            global total_minutes1
+            if total_minutes1 > 0:
+                total_minutes1 -= 3
 
-    def save_changes(self):  # Μέθοδος που αποθηκεύει τις αλλαγές με αμυντικό προγραμματισμό για κενά πεδία
+    def save_changes(self):   # Μέθοδος που αποθηκεύει τις αλλαγές με αμυντικό προγραμματισμό για κενά πεδία
 
         if self.search_name.get() == "":
-            # Display message to user that recipe name is empty
             messagebox.showerror("Error", "Recipe name cannot be empty.")
         elif self.entry.get() == f"{' ':>68}0:00":
-
-            # Display message to user that textbox is empty
             messagebox.showerror("Error", "Recipe time cannot be empty.")
-            # Special string arguments used to represent the starting and ending positions of a text widget's content.
+
         elif hasattr(self, "ingredients_textbox") and \
-                self.ingredients_textbox is not None and self.ingredients_textbox.get("1.0", "end-1c") == "":
-            # Display message to user that ingredients are empty
+            self.ingredients_textbox is not None and self.ingredients_textbox.get("1.0", "end-1c") == "":
             messagebox.showerror("Error", "Ingredients cannot be empty.")
 
+        elif total_minutes > total_minutes1:
+            messagebox.showerror("Error", "Step Timers cannot take more time than the total recipe time.")
+            return
 
-        elif not self.step_message_array and self.steps_created:
-
-            # Display message to user that textbox is empty
-
-            messagebox.showerror("Error", "Recipe Steps cannot be zero.")
+        elif not self.step_message_array:
+            messagebox.showerror("Error", "Recipe Steps can not be zero.")
 
         else:
-            for textbox in self.tab3_text_boxes:
-                if textbox.get() == "":
-                    # Display message to user that textbox is empty
-                    messagebox.showerror("Error", "Step cannot be empty.")
-                    return  # Stop execution if any textbox is empty
-
-            # Check for empty title text boxes
             for title_textbox in self.title_textbox_array:
                 if title_textbox.get() == "":
-                    # Display message to user that title textbox is empty
-                    messagebox.showerror("Error", "Step Title  cannot be empty.")
-                    return  # Stop execution if any title textbox is empty
+                    messagebox.showerror("Error", "Step Title cannot be empty.")
+                    return
+
+            for textbox in self.tab3_text_boxes:
+                if textbox.get() == "":
+                    messagebox.showerror("Error", "Step cannot be empty.")
+                    return
 
             for timer in self.timers:
                 if timer.get() == "" or timer.get() == f"{' ':>50}0:00":
-                    # Display message to user that title textbox is empty
                     messagebox.showerror("Error", "Step Timer cannot be zero.")
                     return
-            for timer in self.timers:
-                if timer.get() == "" or timer.get() == f"{' ':>50}0:00":
-                    # Display message to user that title textbox is empty
-                    messagebox.showerror("Error", "Step Timer cannot be zero.")
-                    return
+
             if self.ingredients_textbox is None:
                 cursor.execute("UPDATE Recipe SET name=?, duration=? WHERE recipeId=?",
                                (self.search_name.get(), self.entry.get().strip(), self.values[0]))
+
             else:
                 cursor.execute("UPDATE Recipe SET name=?, duration=?, ingredients=? WHERE recipeId=?", (
                     self.search_name.get(), self.entry.get().strip(), self.ingredients_textbox.get("1.0", tkinter.END),
@@ -860,7 +860,7 @@ class Recipe_search(customtkinter.CTk):
 
             cursor.execute("DELETE FROM STEP WHERE recipeId = ?", (self.values[0],))
 
-            # Modify the following line to use the correct variable or expression representing the number of steps
+
             stepp_counter = len(self.title_textbox_array)
 
             for counter in range(stepp_counter):
@@ -871,12 +871,7 @@ class Recipe_search(customtkinter.CTk):
             conn.commit()
             self.exit()
 
-    def exit(self):   # Μέθοδος που καταστρέφει τα Frames, widgets, grids και επαναφέρει τα αντίστοιχα του μενού
-        self.left_frame.grid()
-        self.center_frame.grid()
-        self.editing_frame.destroy()
-        self.save_changes_button.destroy()
-
+    def exit(self):
         # Αρχικοποίηση όλων των λιστών και μεταβλητών για ομαλή λειτουργία
         self.timers = []
         self.subtract_button_timers = []
@@ -890,8 +885,19 @@ class Recipe_search(customtkinter.CTk):
         self.text_box_visible = False
         self.text_box_created = False
         self.ingredients_textbox = None
-        self.parent.title("Let's Cook-Recipe Search")  # Η επικεφαλίδα επιστρέφει σε recipe search
-        self.step_counter1 = 0
+
+        # Remove the current widgets from the screen
+        self.left_frame.grid_remove()
+        self.center_frame.grid_remove()
+        self.editing_frame.grid_remove()
+        self.save_changes_button.grid_remove()
+
+        # Recreate the Recipe_search window
+        self.destroy()
+        new_recipe_search = Recipe_search(self.parent, self.photoLabel, self.buttons_frame, self.exit_button)
+        global total_minutes, total_minutes1
+        total_minutes = 0
+        total_minutes1 = 0
 
     def delete(self):
         selectedRowToDelete = self.tree_view.focus()

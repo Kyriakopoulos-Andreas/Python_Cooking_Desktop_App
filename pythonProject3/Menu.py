@@ -1,5 +1,7 @@
 from imports import *
-
+from about_us import about_us
+import os
+file_path = os.path.dirname(__file__)
 
 
 
@@ -35,7 +37,7 @@ class Menu(customtkinter.CTk):
 
 
 
-        self.image = Image.open(r"C:\Users\Admin\Desktop\logo\cook.jpg")  # Διαβάζουμε από τον δίσκο την εικόνα
+        self.image = Image.open(str(file_path)+"\\logo\\cook.jpg")  # Διαβάζουμε από τον δίσκο την εικόνα
         self.photoImage = ImageTk.PhotoImage(self.image)  # Δημιουργία αντικειμένου εικόνας
 
 
@@ -50,7 +52,7 @@ class Menu(customtkinter.CTk):
         self.buttons_frame.grid_rowconfigure(4, weight=1)
 
         # Διάβασμα της εικόνας και δημιουργία αντικειμένου
-        self.img = Image.open(r"C:\Users\Admin\PycharmProjects\pythonProject3\logo\lets_cook1.png")
+        self.img = Image.open(str(file_path)+"\\logo\\lets_cook1.png")
         self.resized_img = self.img.resize((100, 100))  # Resize στην εικόνα
         self.photo = ImageTk.PhotoImage(self.resized_img)
 
@@ -78,7 +80,7 @@ class Menu(customtkinter.CTk):
         self.word_cuisine_button.grid(row=3, column=0, padx=0, pady=20, )
         # Δημιουργία Κουμπιού About us
         self.about_us_button = customtkinter.CTkButton(self.buttons_frame, text="About Us",
-                                                       width=130, height=40)
+                                                       width=130, height=40, command=self.about_us)
         self.about_us_button.grid(row=4, column=0, padx=0, pady=10, )
 
         # Δημιουργία Κουμπιού Exit
@@ -131,8 +133,11 @@ class Menu(customtkinter.CTk):
         Registration(self.parent, self.label, self.buttons_frame, self.exit_button)
 
     def word_cuisine(self):
-        self.information_window = Word_cuisine()   # Δημιουργία αντικειμένου Word_cuisine
+        self.information_window = World_cuisine()   # Δημιουργία αντικειμένου Word_cuisine
         self.information_window.mainloop()   # Τρέχουμε τον βρόγχο του αυτόνομου παραθύρου
 
+    def about_us(self):
+        self.information_window = about_us()  # Δημιουργία αντικειμένου about_us
+        self.information_window.mainloop()  # Τρέχουμε τον βρόγχο του αυτόνομου παραθύρου
 
 

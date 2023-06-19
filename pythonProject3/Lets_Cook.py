@@ -141,7 +141,7 @@ class Lets_Cook(customtkinter.CTk):
         self.stepCounter = 1
         self.numberOfStep = 0
         # Καλούμε τη συνάρτηση για να αυξήσουμε την μπάρα προόδου
-        self.updateProgressBar()
+
         # Δημιουργία των κατάλληλων labels για την εμφάνιση του κάθε βήματος
         self.step_duration_label = customtkinter.CTkLabel(
             self.information_frame,

@@ -47,9 +47,11 @@ class Intro(customtkinter.CTk):
         self.LetS_Cook_Button.grid(row=1, column=1, padx=0, pady=0)
 
     def on_close(self):   # Μέθοδος για κλείσιμο του intro παραθύρου και εισαγωγή στο μενού
-        self.photoLabel.destroy()   # Καταστροφή της εικόνας
-        self.LetS_Cook_Button.grid_remove()  # Remove στο κουμπί του intro
+        for after_id in self.tk.eval('after info').split():
+            self.after_cancel(after_id)
+        self.photoLabel.destroy()  # Καταστροφή της εικόνας
+        self.LetS_Cook_Button.grid_remove() # Remove στο κουμπί του intro
         # Hide the Intro window
         # Create the Menu window
         self.title("Let's Cook-Menu")  # Αλλαγή της επικεφαλίδας
-        Menu(self)  # Περνάμε ως όρισμα το self για να δημιουργήσουμε το άλλο παράθυρο πάνω στη γονική κλάση
+        self.menu = Menu(self)  # Περνάμε ως όρισμα το self για να δημιουργήσουμε το άλλο παράθυρο πάνω στη γονική κλάση

@@ -1,0 +1,18 @@
+About this app
+
+Do you want to keep all your family’s favorite recipes in one place without randomly searching the internet every time?Found a recipe on the internet that looks great and want to try sometime in the future?You felt like eating one of your favorite foods but you forgot a step of the recipe?
+
+Lets_Cook addresses to the cooks who will dedicate the weekend to a perfect beef bourguignon, but love the simplicity of a slow-cooker rendition as well or the bakers who labor over a showstopping 9-layer cake, but will just as happily doctor boxed brownies for a decadent weeknight dessert as well as the entertainers who just want a solid snack spread, without tons of dirty dishes at the end of the night.
+
+Store all your favorite recipes in one place! Lets_Cook is a recipe manager with search and import features. It lets you create your own digital cookbook! Build your own recipe database by gathering recipes on the web and using the import features. By using the Lets_Cook app there is no need to memorize the recipe edits or write them down on a piece of paper.
+It is just you and your own cookery!
+
+Lets_Cook allows you to :
+• Add your favorite cooking recipes easily and quickly.
+• Get step-by-step instructions on how to cook every single recipe as well as the time to complete each step.
+• Search recipes by name, ingredients, type of cuisine, difficulty or food category.
+• Edit/delete recipes that you’ve imported.
+• Supports dark/light mode.
+
+Lets_Cook was created by a group of students consisting of: Andreas Kyriakopoulos, Vasilis Giannoukos, Kostas Vergos and Mixalis Diamantis who study at the Hellenic Open University.
+
